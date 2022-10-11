@@ -154,7 +154,7 @@ void visualizarAlgoritmo(char *algoritmo, int tamanho){
 	}
 		
 	
-	printf("%d", vetor[1]);
+	GotoXY(0, 0);
 	free(vetor);
 }
 
