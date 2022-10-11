@@ -96,6 +96,7 @@ void menuAlgoritmo(char *algoritmo, int *tamanho){
 	
 		switch(opc){
 			case '1':
+				system("cls");
 				visualizarAlgoritmo(algoritmo, *tamanho);
 				break;
 			case '2':
@@ -274,7 +275,7 @@ void get_size_window(int *col, int *row){
 
 void visualizarVetor(int *vet, int tamanho){
 	int i, j, x_inicial;
-	system("cls");
+	//system("cls");
 	
 	get_size_window(&D_X, &D_Y);
 	x_inicial = D_X/2 - tamanho/2;
