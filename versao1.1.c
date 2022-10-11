@@ -20,8 +20,9 @@ Falta:
 #define CARACTERE 219
 #define VELOCIDADE 100
 
-#define VERMELHO     "\x1b[31m"
-#define RESET   "\x1b[0m"
+//Para trocar a cor no terminal
+#define VERMELHO "\x1b[31m"
+#define RESET "\x1b[0m"
 
 //Dimensões
 int D_X, D_Y;
