@@ -1,63 +1,59 @@
+/*
+Falta:
+1 - Implementar os algoritmos de fato em suas devidas funçoes
+2 - Implementar o modo de visualizacao dos algoritmos 
+3 - Implementar uma maneira de controlar a velocidade das iteraçoes
+4 - Implementar outras funcoes como REALIZAR NOVAMENTE/REALIZAR NOVAMENTE COM UM NOVO VETOR/VOLTAR PARA O MENU DO ALGORITMO/
+	VOLTAR PARA O MENU PRINCIPAL
+5 - Implementar o menu de caracteristicas do algoritmo
+6 - NAO ESQUECER DE LIBERAR A MEMÓRIA APOS USAR CALLOC!!!
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <windows.h>
 #include <string.h>
 #include <stdbool.h>
-#define VALOR_MAXIMO 30 //valor maximo de um numero do vetor que será ordenado. !!IMPLEMENTAR UMA FUNCAO QUE DETERMINE O VALOR MAXIMO COM RELACAO NAS DIMENSOES!!
-#define MAX_AMOSTRA 100 //tamanho maximo da amostra !!IMPLEMENTAR UMA FUNCIONALIDADE PARECIDA COM A QUE SERA IMPLEMENTADA NO VALO_MAXIMO!!
+#define VALOR_MAXIMO 30 //valor maximo de um numero do vetor que será ordenado 
+#define MAX_AMOSTRA 100 //tamanho maximo da amostra
 #define MIN_AMOSTRA 5 //tamanho minimo da amostra
 #define CARACTERE 219
-
-//Tempo que o programa esperará a cada iteração das ordenação, garantindo um efeito visual. 
-//LEMBRETE: pode ser implementado uma velocidade dinâmica dependendo do usuario ou do algoritmo
-//!!MUDAR AQUI PARA DEIXAR O PROGRAMA MAIS RAPIDO!!
 #define VELOCIDADE 100
 
-//Para trocar a cor das colunas no terminal
+//Para trocar a cor no terminal
 #define VERMELHO "\x1b[31m"
 #define RESET "\x1b[0m"
 
 //Dimensões
 int D_X, D_Y;
 //tamanho da amostra
-int tamanho=20;
+int tamanho=5;
 
-
-//assinatura das funções
-void menuAlgoritmo(char algoritmo[]);  //lembrete: fazer alterações para dipensar o uso de ponteiros nos menus
-void mainMenu();
-int* gerarVetor();
+void menuAlgoritmo(char *algoritmo, int *amostra);
+void mainMenu(int *tamanho);
+int* gerarVetor(int tamanho);
 void get_size_window(int *col, int *row);
-void visualizarAlgoritmo(char algoritmo[]);
+void visualizarAlgoritmo(char *algoritmo, int tamanho);
 void GotoXY(int x, int y);
 void maximize_window();
-void alterarTamanho(); 
-void visualizarVetor(int vet[]);
-void insertionSort(int a[]);
+void alterarTamanho(int **amostra);
+void visualizarVetor(int *vet, int tamanho);
+void insertionSort(int a[], int tamanho);
 void mergeSort(int a[], int l, int r);
-void swapValor(int index, int valor_ant, int valor_atual, bool cor);
-void imprimir(int a[]);
-//funções criada para garantir o efeito visual do algoritmo MERGE, talvez acha uma maneira de implementar
-//o efeito visual usando apenas as funções já feitas para o insertion, ou uma combinação delas...
-//mas funciona! !falta implementar as cores das troca!
-void apagarColunas(int vet[], int index_l, int index_r);
-void visualizarColunas(int vet[], int index_l, int index_r);
-void swapMerge(int vet[], int l, int r);
+void swapValor(int index, int valor_ant, int valor_atual, int tamanho, bool cor);
 
 //FUNÇÃO PRINCIPAL
 int main(){
 	
 	maximize_window();
-	get_size_window(&D_X, &D_Y);
-	mainMenu();
+	mainMenu(&tamanho);
 	
 	return 0;
 }
 
 
 //FUNÇÕES DO MENU
-void mainMenu(){
+void mainMenu(int *tamanho){
 	char controle = '1', opc;
 	
 	do{
@@ -65,20 +61,19 @@ void mainMenu(){
 	printf("Bem-vindo ao visualizador de algoritmos de ordenacao\n");
 	printf("<1> Insertion Sort\n<2> Merge Sort\n<3> Bubble Sort\n<4> Sair\n");
 	opc=getch();
-		
-		//da clear na tela e chama a funcao escolhida
+	
 		switch(opc){
 			case '1':
 				system("cls");
-				menuAlgoritmo("Insertion");
+				menuAlgoritmo("Insertion", tamanho);
 				break;
 			case '2':
 				system("cls");
-				menuAlgoritmo("Merge");
+				menuAlgoritmo("Merge", tamanho);
 				break;
 			case '3':
 				system("cls");
-				menuAlgoritmo("Bubble");
+				menuAlgoritmo("Bubble", tamanho);
 				break;
 			case '4':
 				exit(0);
@@ -91,22 +86,22 @@ void mainMenu(){
 	}while(controle=='1');
 }
 
-void menuAlgoritmo(char algoritmo[]){
+void menuAlgoritmo(char *algoritmo, int *tamanho){
 	char opc, controle='1';
 	
 	do{
 	//Menu que será mostrado após selecionar um dos algoritmos
-	printf("Algoritmo selecionado: %s Sort\nTamanho da amostra: %d\n", algoritmo, tamanho);
+	printf("Algoritmo selecionado: %s Sort\nTamanho da amostra: %d\n", algoritmo, *tamanho);
 	printf("<1> Visualizar algoritmo\n<2> Alterar tamanho da amostra\n<3> Voltar\n");
 	opc=getch();
 	
 		switch(opc){
 			case '1':
 				system("cls");
-				visualizarAlgoritmo(algoritmo);
+				visualizarAlgoritmo(algoritmo, *tamanho);
 				break;
 			case '2':
-				alterarTamanho();
+				alterarTamanho(&tamanho);
 				system("cls");
 				break;
 			case '3':
@@ -124,7 +119,7 @@ void menuAlgoritmo(char algoritmo[]){
 }
 
 //FUNCOES DE MANIPULACAO DA AMOSTRA
-int* gerarVetor(){
+int* gerarVetor(int tamanho){
 	//funcao calloc para armazenar o vetor no heap para poder utilizar em outro escopo
 	int *vetor = calloc(tamanho, sizeof(int)), i; 
 	
@@ -140,67 +135,84 @@ int* gerarVetor(){
 	return vetor;
 }
 
-//Altera o tamanho da amostra
-void alterarTamanho(){
+void alterarTamanho(int **amostra){
+	
 	system("cls");
-	printf("Tamanho atual da amostra: %d\n", tamanho);
+	printf("Tamanho atual da amostra: %d\n", **amostra);
 	printf("Digite o novo tamanho (5 a 100 inclusive): ");
-	scanf("%d", &tamanho);
-	while((tamanho < MIN_AMOSTRA) | (tamanho > MAX_AMOSTRA)){
+	scanf("%d", *amostra);
+	//fiquei confuso sobre essa parada de ponteiro para um ponteiro, porem funcionou
+	while((**amostra < MIN_AMOSTRA) | (**amostra > MAX_AMOSTRA)){
 		system("cls");
 		printf("Numero invalido, por favor selecione um numero entre 5 e 100...\n");
-		scanf("%d", &tamanho);	
+		scanf("%d", *amostra);	
 	}
 }
 
 
-//----ALGORITMOS DE ODERNACAO---///
-
-//gera um vetor aleatório e chama a funcao de ordenação
-void visualizarAlgoritmo(char algoritmo[]){
+//ALGORITMOS DE ODERNACAO
+void visualizarAlgoritmo(char *algoritmo, int tamanho){
 	int *vetor = gerarVetor(tamanho);
 	
-	if(strcmp(algoritmo, "Insertion") == 0) //strcmp -> compara duas strings e retorna 0 se forem iguais
-		insertionSort(vetor);
+	if(strcmp(algoritmo, "Insertion") == 0)
+		insertionSort(vetor, tamanho);
 	else if((strcmp(algoritmo, "Merge") == 0)){
-		visualizarVetor(vetor);
 		mergeSort(vetor, 0, tamanho);
 	}
 		
 	
 	GotoXY(0, 0);
-	free(vetor);  //nao esquecer de liberar a memoria apos alocar manualmente no gerarVetor();
+	free(vetor);
 }
 
-//algoritmo INSERTION
-void insertionSort(int vetor[]){
+void insertionSort(int vetor[], int tamanho){
 	int i, j, key;
 	  
     for (i = 1; i < tamanho; i++) {
-    	visualizarVetor(vetor);
+    	visualizarVetor(vetor, tamanho);
         key = vetor[i];
         j = i - 1;
         while (j >= 0 && vetor[j] > key) {
-        	swapValor(j+1, vetor[j+1], vetor[j], false);  //swap é feito antes
+        	swapValor(j+1, vetor[j+1], vetor[j], tamanho, false);
             vetor[j + 1] = vetor[j];
             j = j - 1;
-            swapValor(j+1, vetor[j+1], key, true);  //e depois. Se fzr os dois juntos o efeito não é tão interessante
+            swapValor(j+1, vetor[j+1], key, tamanho, true);
             vetor[j + 1] = key;
             Sleep(VELOCIDADE);
         }
     }
 }
 
-// fonte -> https://www.programiz.com/dsa/merge-sort
-// deixei os comentários originais 
+void swapValor(int index, int valor_ant, int valor_atual, int tamanho, bool cor){
+	int x_inicial = D_X/2 - tamanho/2;
+	int i;
+	
+	for(i=0;i<valor_ant;i++){
+		GotoXY(x_inicial+index, D_Y-i-1);
+		printf(" ");
+	}
+	if(!cor){
+		for(i=0;i<valor_atual;i++){
+			GotoXY(x_inicial+index, D_Y-i-1);
+			printf("%c", CARACTERE);
+		}
+	}
+	else{
+		for(i=0;i<valor_atual;i++){
+			GotoXY(x_inicial+index, D_Y-i-1);
+			printf(VERMELHO "%c" RESET, CARACTERE);
+		}
+	}
+}
+
 // Merge two subarrays L and M into arr
 void merge(int a[], int p, int q, int r) {
 
 	// Create L ? A[p..q] and M ? A[q+1..r]
 	int n1 = q - p + 1;
 	int n2 = r - q;
-	int L[n1], M[n2], i, j, k = p;
-	
+
+	int L[n1], M[n2], i, j, k = p;;
 	for (i = 0; i < n1; i++)
 		L[i] = a[p + i];
 	for (j = 0; j < n2; j++)
@@ -250,16 +262,10 @@ void mergeSort(int a[], int l, int r) {
 	
 	    // Merge the sorted subarrays
 	    merge(a, l, m, r);
-	    
-	    swapMerge(a, l, r);
-	    Sleep(VELOCIDADE);
 	}
 }
 
-
-//----FUNÇOES DO CONSOLE----//
-
-//retorna o tamanho do console colxrow
+//FUNÇOES DO CONSOLE
 void get_size_window(int *col, int *row){
     CONSOLE_SCREEN_BUFFER_INFO cmd;
 
@@ -268,11 +274,11 @@ void get_size_window(int *col, int *row){
     *row = cmd.srWindow.Bottom - cmd.srWindow.Top +1;
 }
 
-//imprime o vetor inteiro
-void visualizarVetor(int *vet){
+void visualizarVetor(int *vet, int tamanho){
 	int i, j, x_inicial;
 	//system("cls");
 	
+	get_size_window(&D_X, &D_Y);
 	x_inicial = D_X/2 - tamanho/2;
 	for(i=0;i<tamanho;i++){
 		for(j=0;j<vet[i];j++){
@@ -283,66 +289,6 @@ void visualizarVetor(int *vet){
 	GotoXY(0, 0);
 }
 
-void apagarColunas(int vet[], int index_l, int index_r){
-	int i, j, x_inicial;
-
-	x_inicial = D_X/2 - tamanho/2;
-	for(i=index_l;i<=index_r;i++){
-		for(j=0;j<VALOR_MAXIMO;j++){
-			GotoXY(x_inicial+i, D_Y-j-1);
-			printf(" ");
-		}
-	}
-}
-
-void visualizarColunas(int vet[], int index_l, int index_r){
-	int i, j, x_inicial;
-
-	x_inicial = D_X/2 - tamanho/2;
-	for(i=index_l;i<=index_r;i++){
-		for(j=0;j<vet[i];j++){
-			GotoXY(x_inicial+i, D_Y-j-1);
-			printf("%c", CARACTERE);
-		}
-	}
-	
-}
-
-//função que apaga uma coluna e printa uma nova com valor diferente
-void swapValor(int index, int valor_ant, int valor_atual, bool cor){
-	//index = do valor no vetor, valor_ant = anterior, valor_atual.., cor = true -> vermelho / false -> normal
-	int x_inicial = D_X/2 - tamanho/2;
-	int i;
-	
-	for(i=0;i<valor_ant;i++){
-		GotoXY(x_inicial+index, D_Y-i-1);
-		printf(" ");
-	}
-	if(!cor){
-		for(i=0;i<valor_atual;i++){
-			GotoXY(x_inicial+index, D_Y-i-1);
-			printf("%c", CARACTERE);
-		}
-	}
-	else{
-		for(i=0;i<valor_atual;i++){
-			GotoXY(x_inicial+index, D_Y-i-1);
-			printf(VERMELHO "%c" RESET, CARACTERE);
-		}
-	}
-}
-
-//funciona de forma parecido ao swapValor, porém apaga e printa um grupo de colunas ao invés
-//de cada uma indivudalmente
-void swapMerge(int vet[], int l, int r){
-	//l -> left index, r -> right index
-	apagarColunas(vet, l, r);
-	visualizarColunas(vet, l, r);
-	Sleep(VELOCIDADE);
-}
-
-
-//move o cursor para a coordenada X, Y
 void GotoXY(int x, int y){
     HANDLE a;
     COORD b;
@@ -353,17 +299,8 @@ void GotoXY(int x, int y){
     SetConsoleCursorPosition(a,b);
 }
 
-//maxima a tela no inicio do programa, necessário visualmente
 void maximize_window(){
     HWND consoleWindow = GetConsoleWindow();
     ShowWindow(consoleWindow, SW_MAXIMIZE);
 }
 
-//--auxiliar---//
-void imprimir(int a[]){
-	int i;
-	
-	for(i=0;i<tamanho;i++)
-		printf("%d ", a[i]);
-	
-}
