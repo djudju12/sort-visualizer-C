@@ -165,7 +165,7 @@ void visualizarAlgoritmo(char algoritmo[]){
 		insertionSort(vetor);
 	else if((strcmp(algoritmo, "Merge") == 0)){
 		visualizarVetor(vetor);
-		mergeSort(vetor, 0, tamanho);
+		mergeSort(vetor, 0, tamanho-1);
 	}
 		
 	
@@ -260,7 +260,7 @@ void mergeSort(int a[], int l, int r) {
 
 //----FUNÇOES DO CONSOLE----//
 
-//retorna o tamanho do console colxrow
+//retorna o tamanho do console
 void get_size_window(int *col, int *row){
     CONSOLE_SCREEN_BUFFER_INFO cmd;
 
@@ -301,6 +301,8 @@ void visualizarColunas(int vet[], int index_l, int index_r){
 
 	x_inicial = D_X/2 - tamanho/2;
 	for(i=index_l;i<=index_r;i++){
+		if(index_r-index_l>=tamanho/6)  //se o tamanho do subvetor for maior ou igual a 1/6 do vetor original adiciona um atraso
+			Sleep(VELOCIDADE/2);
 		for(j=0;j<vet[i];j++){
 			GotoXY(x_inicial+i, D_Y-j-1);
 			printf("%c", CARACTERE);
