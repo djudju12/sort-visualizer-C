@@ -1,51 +1,55 @@
-/*
-Falta:
-1 - Implementar os algoritmos de fato em suas devidas funçoes
-2 - Implementar o modo de visualizacao dos algoritmos 
-3 - Implementar uma maneira de controlar a velocidade das iteraçoes
-4 - Implementar outras funcoes como REALIZAR NOVAMENTE/REALIZAR NOVAMENTE COM UM NOVO VETOR/VOLTAR PARA O MENU DO ALGORITMO/
-	VOLTAR PARA O MENU PRINCIPAL
-5 - Implementar o menu de caracteristicas do algoritmo
-6 - NAO ESQUECER DE LIBERAR A MEMÓRIA APOS USAR CALLOC!!!
-*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <windows.h>
 #include <string.h>
 #include <stdbool.h>
-#define VALOR_MAXIMO 30 //valor maximo de um numero do vetor que será ordenado 
-#define MAX_AMOSTRA 100 //tamanho maximo da amostra
+#define VALOR_MAXIMO 30 //valor maximo de um numero do vetor que será ordenado. !!IMPLEMENTAR UMA FUNCAO QUE DETERMINE O VALOR MAXIMO COM RELACAO NAS DIMENSOES!!
+#define MAX_AMOSTRA 100 //tamanho maximo da amostra !!IMPLEMENTAR UMA FUNCIONALIDADE PARECIDA COM A QUE SERA IMPLEMENTADA NO VALO_MAXIMO!!
 #define MIN_AMOSTRA 5 //tamanho minimo da amostra
 #define CARACTERE 219
+
+//Tempo que o programa esperará a cada iteração das ordenação, garantindo um efeito visual. 
+//LEMBRETE: pode ser implementado uma velocidade dinâmica dependendo do usuario ou do algoritmo
+//!!MUDAR AQUI PARA DEIXAR O PROGRAMA MAIS RAPIDO!!
 #define VELOCIDADE 100
 
-//Para trocar a cor no terminal
+//Para trocar a cor das colunas no terminal
 #define VERMELHO "\x1b[31m"
 #define RESET "\x1b[0m"
 
 //Dimensões
 int D_X, D_Y;
 //tamanho da amostra
-int tamanho=5;
+int tamanho=20;
 
-void menuAlgoritmo(char *algoritmo, int *amostra);
+
+//assinatura das funções
+void menuAlgoritmo(char algoritmo[], int *amostra);  //lembrete: fazer alterações para dipensar o uso de ponteiros nos menus
 void mainMenu(int *tamanho);
 int* gerarVetor(int tamanho);
 void get_size_window(int *col, int *row);
-void visualizarAlgoritmo(char *algoritmo, int tamanho);
+void visualizarAlgoritmo(char algoritmo[]);
 void GotoXY(int x, int y);
 void maximize_window();
-void alterarTamanho(int **amostra);
-void visualizarVetor(int *vet, int tamanho);
-void insertionSort(int a[], int tamanho);
+void alterarTamanho(int **amostra); 
+void visualizarVetor(int vet[]);
+void insertionSort(int a[]);
 void mergeSort(int a[], int l, int r);
-void swapValor(int index, int valor_ant, int valor_atual, int tamanho, bool cor);
+void swapValor(int index, int valor_ant, int valor_atual, bool cor);
+void imprimir(int a[]);
+//funções criada para garantir o efeito visual do algoritmo MERGE, talvez acha uma maneira de implementar
+//o efeito visual usando apenas as funções já feitas para o insertion, ou uma combinação delas...
+//mas funciona! !falta implementar as cores das troca!
+void apagarColunas(int vet[], int index_l, int index_r);
+void visualizarColunas(int vet[], int index_l, int index_r);
+void swapMerge(int vet[], int l, int r);
 
 //FUNÇÃO PRINCIPAL
 int main(){
 	
 	maximize_window();
+	get_size_window(&D_X, &D_Y);
 	mainMenu(&tamanho);
 	
 	return 0;
@@ -86,7 +90,7 @@ void mainMenu(int *tamanho){
 	}while(controle=='1');
 }
 
-void menuAlgoritmo(char *algoritmo, int *tamanho){
+void menuAlgoritmo(char algoritmo[], int *tamanho){
 	char opc, controle='1';
 	
 	do{
@@ -98,7 +102,7 @@ void menuAlgoritmo(char *algoritmo, int *tamanho){
 		switch(opc){
 			case '1':
 				system("cls");
-				visualizarAlgoritmo(algoritmo, *tamanho);
+				visualizarAlgoritmo(algoritmo);
 				break;
 			case '2':
 				alterarTamanho(&tamanho);
@@ -151,12 +155,13 @@ void alterarTamanho(int **amostra){
 
 
 //ALGORITMOS DE ODERNACAO
-void visualizarAlgoritmo(char *algoritmo, int tamanho){
+void visualizarAlgoritmo(char algoritmo[]){
 	int *vetor = gerarVetor(tamanho);
 	
 	if(strcmp(algoritmo, "Insertion") == 0)
-		insertionSort(vetor, tamanho);
+		insertionSort(vetor);
 	else if((strcmp(algoritmo, "Merge") == 0)){
+		visualizarVetor(vetor);
 		mergeSort(vetor, 0, tamanho);
 	}
 		
@@ -165,25 +170,25 @@ void visualizarAlgoritmo(char *algoritmo, int tamanho){
 	free(vetor);
 }
 
-void insertionSort(int vetor[], int tamanho){
+void insertionSort(int vetor[]){
 	int i, j, key;
 	  
     for (i = 1; i < tamanho; i++) {
-    	visualizarVetor(vetor, tamanho);
+    	visualizarVetor(vetor);
         key = vetor[i];
         j = i - 1;
         while (j >= 0 && vetor[j] > key) {
-        	swapValor(j+1, vetor[j+1], vetor[j], tamanho, false);
+        	swapValor(j+1, vetor[j+1], vetor[j], false);
             vetor[j + 1] = vetor[j];
             j = j - 1;
-            swapValor(j+1, vetor[j+1], key, tamanho, true);
+            swapValor(j+1, vetor[j+1], key, true);
             vetor[j + 1] = key;
             Sleep(VELOCIDADE);
         }
     }
 }
 
-void swapValor(int index, int valor_ant, int valor_atual, int tamanho, bool cor){
+void swapValor(int index, int valor_ant, int valor_atual, bool cor){
 	int x_inicial = D_X/2 - tamanho/2;
 	int i;
 	
@@ -211,8 +216,8 @@ void merge(int a[], int p, int q, int r) {
 	// Create L ? A[p..q] and M ? A[q+1..r]
 	int n1 = q - p + 1;
 	int n2 = r - q;
-
-	int L[n1], M[n2], i, j, k = p;;
+	int L[n1], M[n2], i, j, k = p;
+	
 	for (i = 0; i < n1; i++)
 		L[i] = a[p + i];
 	for (j = 0; j < n2; j++)
@@ -262,7 +267,17 @@ void mergeSort(int a[], int l, int r) {
 	
 	    // Merge the sorted subarrays
 	    merge(a, l, m, r);
+	    
+	    swapMerge(a, l, r);
+	    //Sleep(VELOCIDADE);
 	}
+}
+
+void swapMerge(int vet[], int l, int r){
+	
+	apagarColunas(vet, l, r);
+	visualizarColunas(vet, l, r);
+	Sleep(VELOCIDADE);
 }
 
 //FUNÇOES DO CONSOLE
@@ -274,11 +289,10 @@ void get_size_window(int *col, int *row){
     *row = cmd.srWindow.Bottom - cmd.srWindow.Top +1;
 }
 
-void visualizarVetor(int *vet, int tamanho){
+void visualizarVetor(int *vet){
 	int i, j, x_inicial;
 	//system("cls");
 	
-	get_size_window(&D_X, &D_Y);
 	x_inicial = D_X/2 - tamanho/2;
 	for(i=0;i<tamanho;i++){
 		for(j=0;j<vet[i];j++){
@@ -287,6 +301,31 @@ void visualizarVetor(int *vet, int tamanho){
 		}
 	}
 	GotoXY(0, 0);
+}
+
+void apagarColunas(int vet[], int index_l, int index_r){
+	int i, j, x_inicial;
+
+	x_inicial = D_X/2 - tamanho/2;
+	for(i=index_l;i<=index_r;i++){
+		for(j=0;j<VALOR_MAXIMO;j++){
+			GotoXY(x_inicial+i, D_Y-j-1);
+			printf(" ");
+		}
+	}
+}
+
+void visualizarColunas(int vet[], int index_l, int index_r){
+	int i, j, x_inicial;
+
+	x_inicial = D_X/2 - tamanho/2;
+	for(i=index_l;i<=index_r;i++){
+		for(j=0;j<vet[i];j++){
+			GotoXY(x_inicial+i, D_Y-j-1);
+			printf("%c", CARACTERE);
+		}
+	}
+	
 }
 
 void GotoXY(int x, int y){
@@ -304,3 +343,10 @@ void maximize_window(){
     ShowWindow(consoleWindow, SW_MAXIMIZE);
 }
 
+void imprimir(int a[]){
+	int i;
+	
+	for(i=0;i<tamanho;i++)
+		printf("%d ", a[i]);
+	
+}
