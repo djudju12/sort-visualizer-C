@@ -60,6 +60,16 @@ void imprimir(int a[]);
 void swapMerge(int vet[], int l, int r);
 void ShowConsoleCursor(bool showFlag);
 void apagarVetor(int vetor[]);
+void menuAlteracao(int vet[]);
+void copy(int array[]);
+void printlist();
+void removerPrimeiro();
+void remover(int index);
+void adicionar(int index, int valor);
+void adicionarPrimeiro(int valor);
+void adicionarUltimo(int valor);
+int* converterVetor();
+void freeList();
 
 //FUNÇÃO PRINCIPAL
 int main(){
@@ -115,10 +125,17 @@ void mainMenu(){
 
 void menuAlgoritmo(char algoritmo[]){
 	char opc, controle='1';
+	int *vetor;
+	bool aleatorio=true, parar=false;
 	
 	do{
 		//Menu que será mostrado após selecionar um dos algoritmos
-		int *vetor = gerarVetor(TAMANHO);
+		if(!aleatorio && !parar){
+			vetor = converterVetor();
+			freeList();
+		}
+		else if(aleatorio && !parar)
+			vetor = gerarVetor(TAMANHO);
 		visualizarVetor(vetor);
 		printf("Algoritmo selecionado: %s Sort\nTamanho da amostra: %d\n", algoritmo, TAMANHO);
 		printf("<1> Iniciar ordenacao\n<2> Alterar tamanho da amostra\n<3> Modificar amostra\n<4> Gerar nova amostra aleatoria\n<5> Voltar\n");
@@ -128,6 +145,7 @@ void menuAlgoritmo(char algoritmo[]){
 				case '1':
 					system("cls");
 					visualizarAlgoritmo(algoritmo, vetor);
+					parar = true;
 					break;
 				case '2':
 					alterarTamanho();
@@ -135,9 +153,15 @@ void menuAlgoritmo(char algoritmo[]){
 					system("cls");
 					break;
 				case '3':
-					//modificarAmostra(vetor);
+					menuAlteracao(vetor);
+					TAMANHO = lenLinkedList();
+					X_INICIAL = D_X/2 - TAMANHO/2;
+					aleatorio = false;
+					break;
 				case '4':
 					apagarVetor(vetor);
+					parar = false;
+					aleatorio = true;
 					break;
 				case '5':
 					system("cls");
@@ -149,12 +173,58 @@ void menuAlgoritmo(char algoritmo[]){
 					controle = getch();
 					system("cls");
 			}
-		free(vetor);  //nao esquecer de liberar a memoria apos alocar manualmente no gerarVetor();
 	}while(controle=='1');
-	
+	free(vetor);  //nao esquecer de liberar a memoria apos alocar manualmente no gerarVetor();
 }
 
-//FUNCOES DE MANIPULACAO DA AMOSTRA
+void menuAlteracao(int vet[]){
+	bool sair=false;
+	copy(vet);
+	
+	
+	while(sair==false){
+		system("cls");
+		printlist();
+		printf("<1> Substituir\n<2> Remover\n<3> Adicionar\n<4> Salvar alteracoes\n");
+		char op;
+		int index, novo_valor;
+		op = getch();
+		switch(op){
+			case '1':
+				printf("Index: ");
+				scanf("%d", &index);
+				printf("Novo valor: ");
+				scanf("%d", &novo_valor);
+				if(index == 0){
+					removerPrimeiro();
+					adicionarPrimeiro(novo_valor);
+				}
+				else{
+					remover(index);
+					adicionar(index, novo_valor);
+				}
+				break;
+			case '2':
+				printf("index: ");
+				scanf("%d", &index);
+				if(index == 0)
+					removerPrimeiro();
+				else
+					remover(index);
+				break;
+			case '3':
+				printf("Valor: ");
+				scanf("%d", &novo_valor);
+				adicionarUltimo(novo_valor);
+				break;
+			case '4':
+				sair = true;
+				break;
+		}
+	}
+}
+
+//----FUNCOES DE MANIPULACAO DA AMOSTRA----//
 int* gerarVetor(){
 	//funcao calloc para armazenar o vetor no heap para poder utilizar em outro escopo
 	int *vetor = calloc(TAMANHO, sizeof(int)), i; 
