@@ -14,6 +14,17 @@
 #include <conio.h>
 #define MIN_AMOSTRA 5 //tamanho minimo da amostra
 #define CARACTERE 219
+#define LARGURA_MENU 40
+#define OFFSET_X 4
+#define OFFSET_Y 8
+#define BARRA_Y 186
+
+//setas
+#define K_D 80
+#define K_U 72
+#define K_L 75
+#define K_R 77
+
 
 //Tempo que o programa esperará a cada iteração das ordenação, garantindo um efeito visual. 
 //LEMBRETE: pode ser implementado uma velocidade dinâmica dependendo do usuario ou do algoritmo
@@ -24,6 +35,9 @@
 #define VERMELHO "\x1b[31m"
 #define RESET "\x1b[0m"
 
+//Para trocar a cor do background no terminal
+#define VERMELHO_BG "\x001b[41;1m"
+#define VERDE_BG "\x001b[42;1m"
 
 //----VARIAVEIS GLOBAIS----//
 //Dimensões
@@ -70,6 +84,9 @@ void adicionarPrimeiro(int valor);
 void adicionarUltimo(int valor);
 int* converterVetor();
 void freeList();
+void printBarraY();
+void imprimir(int a[]);
+int selecionarValor(int vetor[], int vermelho);
 
 //FUNÇÃO PRINCIPAL
 int main(){
@@ -79,9 +96,9 @@ int main(){
 	ShowConsoleCursor(false);
 	
 	//definições dos padrões
-	X_INICIAL = D_X/2 - TAMANHO/2;
-	MAX_AMOSTRA = D_X - 4; //4 -> offeset de 2 pra esquerda e 2 pra direita
-	VALOR_MAXIMO = D_Y - 7;  // valor maximo até 1 antes da primeira linha do menu
+	X_INICIAL = LARGURA_MENU + (D_X-LARGURA_MENU-TAMANHO)/2;
+	MAX_AMOSTRA = D_X - LARGURA_MENU - OFFSET_X;
+	VALOR_MAXIMO = D_Y - 1; // O MENOS 1 DO SANTO -> preciso controlar o valor maximo ainda n ta implementado
 	mainMenu();
 	
 	return 0;
@@ -137,6 +154,8 @@ void menuAlgoritmo(char algoritmo[]){
 		else if(aleatorio && !parar)
 			vetor = gerarVetor(TAMANHO);
 		visualizarVetor(vetor);
+		printBarraY();
+		imprimir(vetor);
 		printf("Algoritmo selecionado: %s Sort\nTamanho da amostra: %d\n", algoritmo, TAMANHO);
 		printf("<1> Iniciar ordenacao\n<2> Alterar tamanho da amostra\n<3> Modificar amostra\n<4> Gerar nova amostra aleatoria\n<5> Voltar\n");
 		opc=getch();
@@ -149,13 +168,9 @@ void menuAlgoritmo(char algoritmo[]){
 					break;
 				case '2':
 					alterarTamanho();
-					X_INICIAL = D_X/2 - TAMANHO/2;
-					system("cls");
 					break;
 				case '3':
 					menuAlteracao(vetor);
-					TAMANHO = lenLinkedList();
-					X_INICIAL = D_X/2 - TAMANHO/2;
 					aleatorio = false;
 					break;
 				case '4':
@@ -179,20 +194,21 @@ void menuAlgoritmo(char algoritmo[]){
 
 void menuAlteracao(int vet[]){
 	bool sair=false;
+	char op;
+	int index, novo_valor;
 	copy(vet);
 	
-	
-	while(sair==false){
+	do{
 		system("cls");
-		printlist();
-		printf("<1> Substituir\n<2> Remover\n<3> Adicionar\n<4> Salvar alteracoes\n");
-		char op;
-		int index, novo_valor;
+		visualizarVetor(converterVetor());
+		printBarraY();
+		//printlist();
+		imprimir(converterVetor(vet));
+		printf("<1> Substituir\n<2> Remover\n<3> Adicionar\n<4> Voltar\n");
 		op = getch();
 		switch(op){
 			case '1':
-				printf("Index: ");
-				scanf("%d", &index);
+				index = selecionarValor(converterVetor(), 2);
 				printf("Novo valor: ");
 				scanf("%d", &novo_valor);
 				if(index == 0){
@@ -205,14 +221,14 @@ void menuAlteracao(int vet[]){
 				}
 				break;
 			case '2':
-				printf("index: ");
-				scanf("%d", &index);
+				index = selecionarValor(converterVetor(), 1);
 				if(index == 0)
 					removerPrimeiro();
 				else
 					remover(index);
 				break;
 			case '3':
+				GotoXY(0, OFFSET_Y-1);
 				printf("Valor: ");
 				scanf("%d", &novo_valor);
 				adicionarUltimo(novo_valor);
@@ -221,7 +237,9 @@ void menuAlteracao(int vet[]){
 				sair = true;
 				break;
 		}
-	}
+		TAMANHO = lenLinkedList();
+		X_INICIAL = LARGURA_MENU + (D_X-LARGURA_MENU-TAMANHO)/2;
+	}while(sair==false);
 }
 
 //----FUNCOES DE MANIPULACAO DA AMOSTRA----//
@@ -243,17 +261,23 @@ int* gerarVetor(){
 
 //Altera o tamanho da amostra
 void alterarTamanho(){
+	int coord_x = 23, coord_y = 1;
+	
+	int count=0;
+	do{
+			
+		GotoXY(coord_x, coord_y);
+		if(count!=0){
+			printf(VERMELHO "(%d - %d) " RESET, MIN_AMOSTRA, MAX_AMOSTRA);
+		}
+		printf(VERMELHO "-> " RESET);
+		ShowConsoleCursor(true);
+		scanf("%d", &TAMANHO);
+		count++;
+	}while((TAMANHO < MIN_AMOSTRA) | (TAMANHO > MAX_AMOSTRA));
 	system("cls");
-	ShowConsoleCursor(true);
-	printf("Tamanho atual da amostra: %d\n", TAMANHO);
-	printf("Digite o novo tamanho (5 a %d): ", MAX_AMOSTRA);
-	scanf("%d", &TAMANHO);
-	while((TAMANHO < MIN_AMOSTRA) | (TAMANHO > MAX_AMOSTRA)){
-		system("cls");
-		printf("Numero invalido, por favor selecione um numero entre 5 e 100...\n");
-		scanf("%d", &TAMANHO);	
-	}
 	ShowConsoleCursor(false);
+	X_INICIAL = LARGURA_MENU + (D_X-LARGURA_MENU-TAMANHO)/2;
 }
 
 
@@ -369,7 +393,7 @@ void get_size_window(int *col, int *row){
 }
 
 //imprime o vetor inteiro
-void visualizarVetor(int *vet){
+void visualizarVetor(int vet[]){
 	int i, j;
 	//system("cls");
 	
@@ -494,11 +518,10 @@ void percorrer()
 void printlist() {
     struct node*temp = head;
 
-	while(temp!=NULL)
-    {
-      printf(" %d ",temp->data);
-      temp=temp->next;
-
+	while(temp!=NULL){
+		//GotoXY
+		printf(" %d ",temp->data);
+		temp=temp->next;
     }
     printf("\n");
 }
@@ -618,9 +641,93 @@ void freeList()
 
 //--auxiliar---//
 void imprimir(int a[]){
+	int x=0, i;
+	
+	int pular_linha=0;
+	for(i=0;i<TAMANHO;i++){
+		GotoXY(x, OFFSET_Y + pular_linha);
+		if(a[i]<10)
+			printf("0%d", a[i]);
+		else
+			printf("%d", a[i]);
+		x+=3;
+		if(x>=39){
+			pular_linha++;
+			x = 0;
+		}
+	}
+	GotoXY(0, 0);
+}
+
+//essa aqui ta uma putaria, tem que dar uma limpada nela
+int selecionarValor(int vetor[], int vermelho){
+	int x=0, y=OFFSET_Y, valor, index=0;
+	char c;
+	
+	while(1){
+		GotoXY(x,y);
+		
+		switch(vermelho){
+			case 1:
+				if(vetor[index]>9)
+					printf(VERMELHO_BG "%d" RESET, vetor[index]);
+				else
+					printf(VERMELHO_BG "0%d" RESET, vetor[index]);
+				break;
+			case 2:
+				if(vetor[index]>9)
+					printf(VERDE_BG "%d" RESET, vetor[index]);
+				else
+					printf(VERDE_BG "0%d" RESET, vetor[index]);
+				break;
+		}
+
+		if(kbhit()){
+			c = getch();
+			GotoXY(x,y);
+			if(vetor[index]>9)
+				printf("%d", vetor[index]);
+			else
+				printf("0%d", vetor[index]);
+			switch(c){
+				case 13:
+					GotoXY(0, OFFSET_Y-1);
+					return index;
+				case K_D:
+					if(index+13<TAMANHO){
+						index+=13;
+						y++;
+					}
+					break;
+				case K_U:
+					if(y>OFFSET_Y){
+						index-=13;
+						y--;
+					}
+					break;
+				case K_L:
+					if(x>0){
+						index--;
+						x-=3;
+					}
+					break;
+				case K_R:
+					if(index<TAMANHO-1 && x<LARGURA_MENU-4){
+						index++;
+						x+=3;
+					break;
+				}
+			}
+		}
+	}
+}
+
+void printBarraY(){
 	int i;
 	
-	for(i=0;i<TAMANHO;i++)
-		printf("%d ", a[i]);
-	
+	for(i=0;i<=D_Y;i++){
+		GotoXY(LARGURA_MENU, i);
+		printf("%c", BARRA_Y);
+	}
+	GotoXY(0,0);
 }
