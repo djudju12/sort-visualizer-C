@@ -1,7 +1,5 @@
 //----TODO---//
 // 2 - Mostrar os numeros do vetor sendo ordenados na tela junto com o grafico -> de preferencia com um background vermelho no numero que esta sendo movido
-// 3 - valores maximos dinamicos
-// 4 - velocidade -> alteravel pelo usuario ou com relação ao algoritmo/tamanho da amostra?
 // 5 - implementar o restante dos algoritmos
 
 
@@ -18,6 +16,7 @@
 #define OFFSET_X 4
 #define OFFSET_Y 8
 #define BARRA_Y 186
+#define VELOCIDADE 100
 
 //setas
 #define K_D 80
@@ -29,7 +28,7 @@
 //Tempo que o programa esperará a cada iteração das ordenação, garantindo um efeito visual. 
 //LEMBRETE: pode ser implementado uma velocidade dinâmica dependendo do usuario ou do algoritmo
 //!!MUDAR AQUI PARA DEIXAR O PROGRAMA MAIS RAPIDO!!
-#define VELOCIDADE 200
+
 
 //Para trocar a cor das colunas no terminal
 #define VERMELHO "\x1b[31m"
@@ -87,6 +86,7 @@ void freeList();
 void printBarraY();
 void imprimir(int a[]);
 int selecionarValor(int vetor[], int vermelho);
+void reprint(int vetor[]);
 
 //FUNÇÃO PRINCIPAL
 int main(){
@@ -98,7 +98,12 @@ int main(){
 	//definições dos padrões
 	X_INICIAL = LARGURA_MENU + (D_X-LARGURA_MENU-TAMANHO)/2;
 	MAX_AMOSTRA = D_X - LARGURA_MENU - OFFSET_X;
-	VALOR_MAXIMO = D_Y - 1; // O MENOS 1 DO SANTO -> preciso controlar o valor maximo ainda n ta implementado
+	
+	if((D_Y - 1)>99)
+		VALOR_MAXIMO = 99;
+	else
+		VALOR_MAXIMO = D_Y - 1;
+
 	mainMenu();
 	
 	return 0;
@@ -162,16 +167,18 @@ void menuAlgoritmo(char algoritmo[]){
 		
 			switch(opc){
 				case '1':
-					system("cls");
 					visualizarAlgoritmo(algoritmo, vetor);
 					parar = true;
 					break;
 				case '2':
 					alterarTamanho();
+					aleatorio = true;
+					parar = false;
 					break;
 				case '3':
 					menuAlteracao(vetor);
 					aleatorio = false;
+					parar=false;
 					break;
 				case '4':
 					apagarVetor(vetor);
@@ -202,7 +209,6 @@ void menuAlteracao(int vet[]){
 		system("cls");
 		visualizarVetor(converterVetor());
 		printBarraY();
-		//printlist();
 		imprimir(converterVetor(vet));
 		printf("<1> Substituir\n<2> Remover\n<3> Adicionar\n<4> Voltar\n");
 		op = getch();
@@ -211,27 +217,34 @@ void menuAlteracao(int vet[]){
 				index = selecionarValor(converterVetor(), 2);
 				printf("Novo valor: ");
 				scanf("%d", &novo_valor);
-				if(index == 0){
-					removerPrimeiro();
-					adicionarPrimeiro(novo_valor);
-				}
-				else{
-					remover(index);
-					adicionar(index, novo_valor);
+				if(novo_valor<=VALOR_MAXIMO){
+					if(index == 0){
+						removerPrimeiro();
+						adicionarPrimeiro(novo_valor);
+					}
+					else{
+						remover(index);
+						adicionar(index, novo_valor);
+					}
 				}
 				break;
 			case '2':
-				index = selecionarValor(converterVetor(), 1);
-				if(index == 0)
-					removerPrimeiro();
-				else
-					remover(index);
+				if(lenLinkedList()>MIN_AMOSTRA){
+					index = selecionarValor(converterVetor(), 1);
+					if(index == 0)
+						removerPrimeiro();
+					else
+						remover(index);
+				}
 				break;
 			case '3':
-				GotoXY(0, OFFSET_Y-1);
-				printf("Valor: ");
-				scanf("%d", &novo_valor);
-				adicionarUltimo(novo_valor);
+				if(lenLinkedList()<MAX_AMOSTRA){
+					GotoXY(0, OFFSET_Y-1);
+					printf("Valor: ");
+					scanf("%d", &novo_valor);
+					if(novo_valor<=VALOR_MAXIMO)
+						adicionarUltimo(novo_valor);
+				}
 				break;
 			case '4':
 				sair = true;
@@ -310,7 +323,7 @@ void insertionSort(int vetor[]){
             j = j - 1;
             swapValor(j+1, vetor[j+1], key, true);  //e depois. Se fzr os dois juntos o efeito não é tão interessante
             vetor[j + 1] = key;
-            Sleep(VELOCIDADE);
+            Sleep(VELOCIDADE/2);
         }
     }
 }
@@ -441,6 +454,7 @@ void apagarVetor(int vetor[]){
 	}
 }
 
+
 //Itera sobre um determinado subarray[l...r]
 void swapMerge(int vet[], int l, int r){
 	int i, j;
@@ -449,10 +463,13 @@ void swapMerge(int vet[], int l, int r){
 	for(i=l;i<=r;i++){
 		if(lenSubvetor>=TAMANHO/6)
 			Sleep(VELOCIDADE/4);
+		else
+			Sleep(VELOCIDADE/2);
 		swapValor(i, VALOR_MAXIMO, vet[i], true);
 	}
 	visualizarVetor(vet);
 }
+
 
 
 //move o cursor para a coordenada X, Y
