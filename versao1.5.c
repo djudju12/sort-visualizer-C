@@ -316,15 +316,15 @@ void visualizarAlgoritmo(char algoritmo[], int vetor[]){
 void bubbleSort(int vet[]){
 	int i, j, temp;
 	
-	visualizarVetor(vet);
 	for(i=0;i<TAMANHO;i++){
+		visualizarVetor(vet);
 		for(j=0;j<TAMANHO-i-1;j++){
 			if(vet[j]>vet[j+1]){
 				temp = vet[j];
 				vet[j] = vet[j+1];
 				vet[j+1] = temp;
-				swapBubble(vet, j, j+1);
 			}
+			swapBubble(vet, j, j+1);
 		}
 	}
 }
@@ -476,6 +476,7 @@ void apagarVetor(int vetor[]){
 
 void swapBubble(int vet[], int l, int r){
 	int i, j;
+	Sleep(VELOCIDADE/4);
 	
 	for(i=l;i<=r;i++){
 		for(j=0;j<=VALOR_MAXIMO;j++){
@@ -489,7 +490,6 @@ void swapBubble(int vet[], int l, int r){
 			else
 				printf("%c", CARACTERE);
 		}
-		Sleep(VELOCIDADE);
 	}
 	
 }
