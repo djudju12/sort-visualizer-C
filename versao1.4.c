@@ -1,8 +1,8 @@
 //----TODO---//
-// 1 - Manipulação do vetor (remover, adicionar, substituir) -> colocar uns efeitos graficos aq também
 // 2 - Mostrar os numeros do vetor sendo ordenados na tela junto com o grafico -> de preferencia com um background vermelho no numero que esta sendo movido
 // 3 - valores maximos dinamicos
 // 4 - velocidade -> alteravel pelo usuario ou com relação ao algoritmo/tamanho da amostra?
+// 5 - implementar o restante dos algoritmos
 
 
 #include <stdio.h>
