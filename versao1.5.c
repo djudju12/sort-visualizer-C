@@ -17,12 +17,12 @@
 #define BARRA_Y 186
 #define VELOCIDADE 100
 
-//setas
+//teclas ASCII
 #define K_D 80
 #define K_U 72
 #define K_L 75
 #define K_R 77
-
+#define ENTER 13
 
 //Tempo que o programa esperará a cada iteração das ordenação, garantindo um efeito visual. 
 //LEMBRETE: pode ser implementado uma velocidade dinâmica dependendo do usuario ou do algoritmo
@@ -216,6 +216,7 @@ void menuAlteracao(int vet[]){
 		switch(op){
 			case '1':
 				index = selecionarValor(converterVetor(), 2);
+				GotoXY(0, OFFSET_Y-1);
 				printf("Novo valor: ");
 				scanf("%d", &novo_valor);
 				if(novo_valor<=VALOR_MAXIMO){
@@ -275,14 +276,15 @@ int* gerarVetor(){
 
 //Altera o tamanho da amostra
 void alterarTamanho(){
-	int coord_x = 23, coord_y = 1;
+	int coord_x = 23, coord_y = 1; 
 	
 	int count=0;
 	do{
+		GotoXY(coord_x, coord_y);
 		if(count!=0){
-			gotoPrint("VERMELHO " "(%d - %d)" " RESET, MIN_AMOSTRA, MAX_AMOSTRA");
+			printf(VERMELHO "(%d - %d)" RESET, MIN_AMOSTRA, MAX_AMOSTRA);
 		}
-		printf(VERMELHO "-> " RESET);
+		printf(VERMELHO " -> " RESET);
 		ShowConsoleCursor(true);
 		scanf("%d", &TAMANHO);
 		count++;
@@ -743,8 +745,7 @@ int selecionarValor(int vetor[], int vermelho){
 			else
 				printf("0%d", vetor[index]);
 			switch(c){
-				case 13: //ENTER
-					GotoXY(0, OFFSET_Y-1);
+				case ENTER:
 					return index;
 				case K_D:
 					if(index+index_max<TAMANHO){
