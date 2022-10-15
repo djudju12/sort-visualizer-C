@@ -89,7 +89,7 @@ void reprint(int vetor[]);
 void bubbleSort(int vet[]);
 void swapBubble(int vet[], int l, int r);
 
-//FUNÇÃO PRINCIPAL
+//FUNÇÃO PRINCIPAL 
 int main(){
 	
 	maximize_window();
@@ -279,10 +279,8 @@ void alterarTamanho(){
 	
 	int count=0;
 	do{
-			
-		GotoXY(coord_x, coord_y);
 		if(count!=0){
-			printf(VERMELHO "(%d - %d) " RESET, MIN_AMOSTRA, MAX_AMOSTRA);
+			gotoPrint("VERMELHO " "(%d - %d)" " RESET, MIN_AMOSTRA, MAX_AMOSTRA");
 		}
 		printf(VERMELHO "-> " RESET);
 		ShowConsoleCursor(true);
@@ -705,7 +703,7 @@ void imprimir(int a[]){
 		else
 			printf("%d", a[i]);
 		x+=3;
-		if(x>=39){
+		if(x>=LARGURA_MENU-1){
 			pular_linha++;
 			x = 0;
 		}
@@ -714,9 +712,9 @@ void imprimir(int a[]){
 }
 
 
-//essa aqui ta uma putaria, tem que dar uma limpada nela
+//Funcao usada para selecionar um valor no menu de modificação de amostra
 int selecionarValor(int vetor[], int vermelho){
-	int x=0, y=OFFSET_Y, valor, index=0;
+	int x=0, y=OFFSET_Y, valor, index=0, index_max=13; //index_max -> 13 valores do vetor por linha
 	char c;
 	
 	while(1){
@@ -745,18 +743,18 @@ int selecionarValor(int vetor[], int vermelho){
 			else
 				printf("0%d", vetor[index]);
 			switch(c){
-				case 13:
+				case 13: //ENTER
 					GotoXY(0, OFFSET_Y-1);
 					return index;
 				case K_D:
-					if(index+13<TAMANHO){
-						index+=13;
+					if(index+index_max<TAMANHO){
+						index+=index_max;
 						y++;
 					}
 					break;
 				case K_U:
 					if(y>OFFSET_Y){
-						index-=13;
+						index-=index_max;
 						y--;
 					}
 					break;
@@ -767,7 +765,7 @@ int selecionarValor(int vetor[], int vermelho){
 					}
 					break;
 				case K_R:
-					if(index<TAMANHO-1 && x<LARGURA_MENU-4){
+					if(index<TAMANHO-1 && x<LARGURA_MENU-OFFSET_X){
 						index++;
 						x+=3;
 					break;
@@ -786,3 +784,5 @@ void printBarraY(){
 	}
 	GotoXY(0,0);
 }
+
+
