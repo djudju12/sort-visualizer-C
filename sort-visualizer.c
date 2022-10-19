@@ -509,15 +509,6 @@ void printBarraY(){
 	GotoXY(0,0);
 }
 
-//retorna o tamanho do console
-void get_size_window(int *col, int *row){
-    CONSOLE_SCREEN_BUFFER_INFO cmd;
-
-    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cmd);
-    *col = cmd.srWindow.Right - cmd.srWindow.Left +1;
-    *row = cmd.srWindow.Bottom - cmd.srWindow.Top +1;
-}
-
 //imprime o vetor inteiro
 void visualizarVetor(int vet[]){
 	int i, j;
@@ -604,6 +595,14 @@ void swapMerge(int vet[], int l, int r){
 	visualizarVetor(vet);
 }
 
+//retorna o tamanho do console
+void get_size_window(int *col, int *row){
+    CONSOLE_SCREEN_BUFFER_INFO cmd;
+
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cmd);
+    *col = cmd.srWindow.Right - cmd.srWindow.Left +1;
+    *row = cmd.srWindow.Bottom - cmd.srWindow.Top +1;
+}
 
 //move o cursor para a coordenada X, Y
 void GotoXY(int x, int y){
