@@ -1,7 +1,3 @@
-//----TODO---//
-// 5 - implementar o restante dos algoritmos
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -23,10 +19,6 @@
 #define K_L 75
 #define K_R 77
 #define ENTER 13
-
-//Tempo que o programa esperará a cada iteração das ordenação, garantindo um efeito visual. 
-//LEMBRETE: pode ser implementado uma velocidade dinâmica dependendo do usuario ou do algoritmo
-//!!MUDAR AQUI PARA DEIXAR O PROGRAMA MAIS RAPIDO!!
 
 
 //Para trocar a cor das colunas no terminal
@@ -168,6 +160,7 @@ void menuAlgoritmo(char algoritmo[]){
 					vetor = gerarVetor();
 					break;
 				case '5':
+					system("cls");
 					controle = '0';
 					break;
 				default:
@@ -186,7 +179,7 @@ void menuAlteracao(int vet[]){
 
 	copy(vet);  // -> converte o vetor para uma lista linkada para realizara as operaçoes	
 	do{
-		imprimirLayout(vet);
+		imprimirLayout(converterVetor());
 		printf("<1> Substituir\n<2> Remover\n<3> Adicionar\n<4> Voltar\n\nValor minimo: %d\nValor maximo: %d", 1, VALOR_MAXIMO);
 		op = getch();
 		switch(op){
