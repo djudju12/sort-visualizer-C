@@ -88,6 +88,7 @@ int selecionarIndex(int vetor[], int cor);
 void reprint(int vetor[]);
 void bubbleSort(int vet[]);
 void swapBubble(int vet[], int l, int r);
+void imprimirLayout(int vet[]);
 
 //FUNÇÃO PRINCIPAL 
 int main(){
@@ -141,13 +142,10 @@ void menuAlgoritmo(char algoritmo[]){
 	char opc, controle='1';
 	int *vetor;
 	
-	system("cls");
 	vetor = gerarVetor();
 	do{
+		imprimirLayout(vetor);
 		//Menu que será mostrado após selecionar um dos algoritmos
-		visualizarVetor(vetor);  // -> barras
-		printBarraY();  // -> barra vertical do menu
-		imprimir(vetor);  // -> vetor numérico
 		printf("Algoritmo selecionado: %s Sort\nTamanho da amostra: %d\n", algoritmo, TAMANHO);
 		printf("<1> Iniciar ordenacao\n<2> Alterar tamanho da amostra\n<3> Modificar amostra\n<4> Gerar nova amostra aleatoria\n<5> Voltar\n");
 		opc=getch();
@@ -170,7 +168,6 @@ void menuAlgoritmo(char algoritmo[]){
 					vetor = gerarVetor();
 					break;
 				case '5':
-					system("cls");
 					controle = '0';
 					break;
 				default:
@@ -189,11 +186,7 @@ void menuAlteracao(int vet[]){
 
 	copy(vet);  // -> converte o vetor para uma lista linkada para realizara as operaçoes	
 	do{
-		system("cls");
-		visualizarVetor(converterVetor());
-		printBarraY();
-		imprimir(converterVetor(vet));
-		
+		imprimirLayout(vet);
 		printf("<1> Substituir\n<2> Remover\n<3> Adicionar\n<4> Voltar\n\nValor minimo: %d\nValor maximo: %d", 1, VALOR_MAXIMO);
 		op = getch();
 		switch(op){
@@ -264,17 +257,18 @@ int* gerarVetor(){
 //Altera o tamanho da amostra
 void alterarTamanho(){
 	int coord_x = 23, coord_y = 1;
-	
-	int count=0;
+ 
+ 	//tratamento do erro de digitação
+	bool typo=false;  
 	do{
 		GotoXY(coord_x, coord_y);
-		if(count!=0){
+		if(typo){
 			printf(VERMELHO "(%d - %d)" RESET, MIN_AMOSTRA, MAX_AMOSTRA);
 		}
 		printf(VERMELHO " -> " RESET);
 		ShowConsoleCursor(true);
 		scanf("%d", &TAMANHO);
-		count++;
+		typo = true;
 	}while((TAMANHO < MIN_AMOSTRA) | (TAMANHO > MAX_AMOSTRA));
 	system("cls");
 	ShowConsoleCursor(false); 
@@ -402,7 +396,14 @@ void mergeSort(int a[], int l, int r) {
 
 //----FUNÇOES DO CONSOLE----//
 
-// imprime o vetor numero abaixo do menu.
+void imprimirLayout(int vet[]){
+	system("cls");
+	visualizarVetor(vet);  // -> barras
+	printBarraY();  // -> barra vertical do menu
+	imprimir(vet);  // -> vetor numérico
+}
+
+// imprime o vetor numério abaixo do menu.
 void imprimir(int a[]){
 	int x=0, i;
 	
@@ -446,10 +447,6 @@ int selecionarIndex(int vetor[], int cor){
 				else
 					printf(VERDE_BG "0%d" RESET, vetor[index]);
 				break;
-			default:
-				system("cls");
-				printf("selecionarIndex nao possui cor -> %d", cor);
-				exit(1);
 		}
 
 		if(kbhit()){
@@ -491,7 +488,7 @@ int selecionarIndex(int vetor[], int cor){
 						index++;
 						x+=3;
 					break;
-				}
+					}
 			}
 			swapValor(index, vetor[index], vetor[index], true);
 		}
