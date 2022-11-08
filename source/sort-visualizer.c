@@ -5,15 +5,17 @@
 #include <string.h>
 #include <stdbool.h>
 #include <conio.h>
-#include "linkedlist.c"
-#include "console.c"
+#include "linkedlist.h"
+#include "console.h"
 
 #define MIN_AMOSTRA 5 //tamanho minimo da amostra
 #define CARACTERE 219
 #define LARGURA_MENU 40
 #define OFFSET_X 4
-#define OFFSET_Y 8
+#define OFFSET_Y 9
 #define BARRA_Y 186
+#define VEL_MIN 10
+#define VEL_MAX 999
 
 //teclas ASCII
 #define K_D 80
@@ -123,7 +125,7 @@ void menuAlgoritmo(char algoritmo[]){
 	do{
 		imprimirLayout(vetor);
 		//Menu que será mostrado após selecionar um dos algoritmos
-		printf("Algoritmo selecionado: %s Sort\nTamanho da amostra: %d\tVelocidade: %d\n", algoritmo, TAMANHO, VELOCIDADE);
+		printf("Algoritmo selecionado: %s Sort\nTamanho da amostra: %d\tVelocidade: %d%%\n", algoritmo, TAMANHO, VELOCIDADE);
 		printf("<1> Iniciar ordenacao\n<2> Alterar tamanho\n<3> Alterar velocidade\n<4> Modificar amostra\n<5> Gerar nova amostra aleatoria\n<6> Voltar\n");
 		opc=getch();
 		
@@ -247,7 +249,7 @@ void imprimir(int a[]){
 
 // Altera o tamanho da amostra
 void alterarTamanho(){
-	int coord_x = 20, coord_y = 3, aux;
+	int coord_x = 0, coord_y = OFFSET_Y-1, aux;
  
 	GotoXY(coord_x, coord_y);
 	printf(VERMELHO "(%d - %d) -> " RESET, MIN_AMOSTRA, MAX_AMOSTRA);
@@ -262,16 +264,16 @@ void alterarTamanho(){
 }
 
 void alterarVelocidade(){
-	int coord_x = 23, coord_y = 4;
+	int coord_x = 0, coord_y = OFFSET_Y-1;
 	float aux;
  
 	GotoXY(coord_x, coord_y);
-	printf(VERMELHO "( >0 ) -> " RESET, MIN_AMOSTRA, MAX_AMOSTRA);
+	printf(VERMELHO "(%d%% - %d%%) -> " RESET, VEL_MIN, VEL_MAX);
 	ShowConsoleCursor(true);
 	fflush(stdin);
 	scanf("%f", &aux);
-	if(aux > 0)
-		VELOCIDADE *= aux;
+	if((aux>=10) && (aux <= 999))
+		VELOCIDADE = aux;
 	ShowConsoleCursor(false); 
 }
 
