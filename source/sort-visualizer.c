@@ -27,6 +27,8 @@
 
 //Para trocar a cor das colunas no terminal
 #define VERMELHO "\x1b[31m"
+#define VERDE "\x1b[32m"
+#define AZUL "\x1b[34m"
 #define RESET "\x1b[0m"
 
 //Para trocar a cor do background no terminal
@@ -54,7 +56,7 @@ void alterarTamanho();
 void visualizarVetor(int vet[]);
 void insertionSort(int a[]);
 void mergeSort(int a[], int l, int r);
-void trocarColuna(int index, int valor_ant, int valor_atual, bool cor);
+void trocarColuna(int index, int valor_atual, int cor);
 void imprimir(int a[]);
 void trocarVetor(int vet[], int l, int r);
 void apagarVetor(int l, int r);
@@ -68,6 +70,10 @@ void trocarBubble(int vet[], int l, int r);
 void imprimirLayout(int vet[]);
 void apagarColuna(int index);
 void alterarVelocidade();
+void quickSort(int vet[], int low, int high);
+int partition(int vet[], int low, int high);
+void swap(int *a, int *b);
+
 
 //FUNÇÃO PRINCIPAL 
 int main(){
@@ -97,7 +103,7 @@ void mainMenu(){
 	do{
 	//Menu inicial
 	printf("Bem-vindo ao visualizador de algoritmos de ordenacao\n");
-	printf("<1> Insertion Sort\n<2> Merge Sort\n<3> Bubble Sort\n<4> Sair\n");
+	printf("<1> Insertion Sort\n<2> Merge Sort\n<3> Bubble Sort\n<4> Quick Sort\n<5> Sair\n");
 	opc=getch();
 		switch(opc){
 			case '1':
@@ -110,6 +116,9 @@ void mainMenu(){
 				menuAlgoritmo("Bubble");
 				break;
 			case '4':
+				menuAlgoritmo("Quick");
+				break;
+			case '5':
 				exit(0);
 			default:
 				system("cls"); //-> se nao limpar a tela buga!
@@ -284,7 +293,7 @@ int selecionarIndex(int vetor[], int cor){
 	char c;
 	bool parar = false;
 	
-	trocarColuna(index, vetor[index], vetor[index], true); 
+	trocarColuna(index, vetor[index], true); 
 	// Quando um botão é pressionado, apaga o anterior e printa o background no novo index
 	while(parar==false){
 		GotoXY(x,y);
@@ -306,7 +315,7 @@ int selecionarIndex(int vetor[], int cor){
 
 		if(kbhit()){
 			c = getch();
-			trocarColuna(index, vetor[index], vetor[index], false);
+			trocarColuna(index, vetor[index], false);
 			GotoXY(x,y);
 			// ENTER -> retorna a funcao sem apagar o anterior
 			if(c != ENTER){
@@ -345,7 +354,7 @@ int selecionarIndex(int vetor[], int cor){
 					break;
 					}
 				}
-			trocarColuna(index, vetor[index], vetor[index], true);
+			trocarColuna(index, vetor[index], true);
 		}
 	}
 	return index;
@@ -368,12 +377,12 @@ void visualizarAlgoritmo(char algoritmo[], int vetor[]){
 
 	if(strcmp(algoritmo, "Insertion") == 0) //strcmp -> compara duas strings e retorna 0 se forem iguais
 		insertionSort(vetor);
-	else if((strcmp(algoritmo, "Merge") == 0)){
+	else if((strcmp(algoritmo, "Merge") == 0))
 		mergeSort(vetor, 0, TAMANHO-1);
-	}
-	else if((strcmp(algoritmo, "Bubble")==0)){
+	else if((strcmp(algoritmo, "Bubble") == 0))
 		bubbleSort(vetor);
-	}
+	else if((strcmp(algoritmo, "Quick") == 0))
+		quickSort(vetor, 0, TAMANHO - 1);
 	
 	GotoXY(0, 0);  // volta o cursor para o inicio após a ordenação
 }
@@ -402,10 +411,10 @@ void insertionSort(int vetor[]){
         key = vetor[i];
         j = i - 1;
         while (j >= 0 && vetor[j] > key) {
-        	trocarColuna(j+1, vetor[j+1], vetor[j], false);  //swap é feito antes
+        	trocarColuna(j+1, vetor[j], false);  //swap é feito antes
             vetor[j + 1] = vetor[j];
             j = j - 1;
-            trocarColuna(j+1, vetor[j+1], key, true);  //e depois. Se fzr os dois juntos o efeito não é tão interessante
+            trocarColuna(j+1, key, true);  //e depois. Se fzr os dois juntos o efeito não é tão interessante
             vetor[j + 1] = key;
             Sleep(VELOCIDADE/2);
         }
@@ -476,6 +485,44 @@ void mergeSort(int a[], int l, int r) {
 	}
 }
 
+void swap(int *a, int *b)
+{
+	int t = *a;
+	*a = *b;
+	*b = t;	
+}
+
+int partition(int vet[], int low, int high)
+{
+	int pivot = vet[high]; // -> posicao a direita
+	trocarColuna(high, pivot, 3);
+	int i = (low - 1); // -> posicao do menor elemento, essa posicao é guardada para trocar os valores 
+	int j;
+	
+	for(j = low; j <= high - 1; j++)
+	{
+		if(vet[j] < pivot)
+		{
+			i++; 
+			swap(&vet[i], &vet[j]); // coloca todos os numeros menores que o pivo para a esquerda
+		}
+	}
+	swap(&vet[i + 1], &vet[high]);  //a posicao i+1 é a posicao do primeiro valor que é maior ou igual ao pivo, essa instrução posiciona o pivo no lugar correto
+	// assim, os valores maiores estarão para a direita e os menores estarão para a esquerda
+	return (i + 1); //retorna a posicao do pivot
+}
+
+void quickSort(int vet[], int low, int high)
+{
+	if(low < high)
+	{
+		int pi = partition(vet, low, high);
+		trocarVetor(vet, low, high);
+		
+		quickSort(vet, low, pi - 1); 
+		quickSort(vet, pi + 1, high);
+	}
+}
 //------FUNÇÕES DE VISUALIZAÇÃO DOS ALGORITMOS------//
 
 //imprime o vetor inteiro
@@ -493,21 +540,27 @@ void visualizarVetor(int vet[]){
 }
 
 //função que apaga uma coluna e printa uma nova com valor diferente
-void trocarColuna(int index, int valor_ant, int valor_atual, bool cor){
+void trocarColuna(int index, int valor_atual, int cor){
 	//index = do valor no vetor, valor_ant = anterior, valor_atual.., cor = true -> vermelho / false -> normal
 	int i;
 	
 	apagarColuna(index);
-	if(!cor){
-		for(i=0;i<valor_atual;i++){
-			GotoXY(X_INICIAL+index, D_Y-i-1);
-			printf("%c", CARACTERE);
-		}
-	}
-	else{
-		for(i=0;i<valor_atual;i++){
-			GotoXY(X_INICIAL+index, D_Y-i-1);
-			printf(VERMELHO "%c" RESET, CARACTERE);
+	
+	for(i=0;i<valor_atual;i++){
+		GotoXY(X_INICIAL+index, D_Y-i-1);
+		switch(cor){
+			case 0:
+				printf("%c", CARACTERE);
+				break;
+			case 1:
+				printf(VERMELHO "%c" RESET, CARACTERE);
+				break;
+			case 2:
+				printf(VERDE "%c" RESET, CARACTERE);
+				break;
+			case 3:
+				printf(AZUL "%c" RESET, CARACTERE);
+				break;
 		}
 	}
 }
@@ -562,9 +615,12 @@ void trocarVetor(int vet[], int l, int r){
 			Sleep(VELOCIDADE/4);
 		else
 			Sleep(VELOCIDADE/2);
-		trocarColuna(i, VALOR_MAXIMO, vet[i], true);
+		
+		trocarColuna(i, vet[i], 1);
+		if(i>0)
+			trocarColuna(i-1, vet[i-1], 0);
 	}
-	visualizarVetor(vet);
+	trocarColuna(r, vet[r], 0);
 }
 
 //----GERA AMOSTRA----//
