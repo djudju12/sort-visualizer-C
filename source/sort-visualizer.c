@@ -44,36 +44,33 @@ int TAMANHO=20;
 int X_INICIAL;
 // Tamanho maximo da amostra e valor maximo de um valor da amostra
 int MAX_AMOSTRA, VALOR_MAXIMO;
-// Velocidade
-int VELOCIDADE=100;
 
 //assinatura das funções
 void menuAlgoritmo(char algoritmo[]);  //lembrete: fazer alterações para dipensar o uso de ponteiros nos menus
 void mainMenu();
 int* gerarVetor();
-void visualizarAlgoritmo(char algoritmo[], int vetor[]);
+void visualizarAlgoritmo(char algoritmo[], int vetor[], int velocidade);
 void alterarTamanho(); 
 void visualizarVetor(int vet[]);
-void insertionSort(int a[]);
-void mergeSort(int a[], int l, int r);
+void insertionSort(int a[], int velocidade);
+void mergeSort(int a[], int l, int r, int velocidade);
 void trocarColuna(int index, int valor_atual, int cor);
 void imprimir(int a[]);
-void trocarVetor(int vet[], int l, int r);
+void trocarVetor(int vet[], int l, int r, int velocidade);
 void apagarVetor(int l, int r);
 void menuAlteracao(int vet[]);
 void printBarraY();
 void imprimir(int a[]);
 int selecionarIndex(int vetor[], int cor);
 void reprint(int vetor[]);
-void bubbleSort(int vet[]);
-void trocarBubble(int vet[], int l, int r);
+void trocarBubble(int vet[], int l, int r, int velocidade);
 void imprimirLayout(int vet[]);
 void apagarColuna(int index);
-void alterarVelocidade();
-void quickSort(int vet[], int low, int high);
+void alterarVelocidade(int *velocidade);
+void quickSort(int vet[], int low, int high, int velocidade);
 int partition(int vet[], int low, int high);
 void swap(int *a, int *b);
-
+void bubbleSort(int vet[], int velocidade);
 
 //FUNÇÃO PRINCIPAL 
 int main(){
@@ -99,7 +96,7 @@ int main(){
 //----FUNÇÕES DO MENU----//
 void mainMenu(){
 	char opc;
-
+	
 	do{
 	//Menu inicial
 	printf("Bem-vindo ao visualizador de algoritmos de ordenacao\n");
@@ -129,25 +126,26 @@ void mainMenu(){
 void menuAlgoritmo(char algoritmo[]){
 	char opc, controle='1';
 	int *vetor;
+	int velocidade = 100;
 	
 	vetor = gerarVetor();
 	do{
 		imprimirLayout(vetor);
 		//Menu que será mostrado após selecionar um dos algoritmos
-		printf("Algoritmo selecionado: %s Sort\nTamanho da amostra: %d\tVelocidade: %d%%\n", algoritmo, TAMANHO, VELOCIDADE);
+		printf("Algoritmo selecionado: %s Sort\nTamanho da amostra: %d\tVelocidade: %d%%\n", algoritmo, TAMANHO, velocidade);
 		printf("<1> Iniciar ordenacao\n<2> Alterar tamanho\n<3> Alterar velocidade\n<4> Modificar amostra\n<5> Gerar nova amostra aleatoria\n<6> Voltar\n");
 		opc=getch();
 		
 			switch(opc){
 				case '1':
-					visualizarAlgoritmo(algoritmo, vetor);
+					visualizarAlgoritmo(algoritmo, vetor, velocidade);
 					break;
 				case '2':
 					alterarTamanho();
 					vetor = gerarVetor(TAMANHO);
 					break;
 				case '3':
-					alterarVelocidade();
+					alterarVelocidade(&velocidade);
 					break;
 				case '4':
 					menuAlteracao(vetor);
@@ -272,7 +270,7 @@ void alterarTamanho(){
 	X_INICIAL = LARGURA_MENU + (D_X-LARGURA_MENU-TAMANHO)/2;
 }
 
-void alterarVelocidade(){
+void alterarVelocidade(int *velocidade){
 	int coord_x = 0, coord_y = OFFSET_Y-1;
 	float aux;
  
@@ -282,7 +280,7 @@ void alterarVelocidade(){
 	fflush(stdin);
 	scanf("%f", &aux);
 	if((aux>=10) && (aux <= 999))
-		VELOCIDADE = aux;
+		*velocidade = aux;
 	ShowConsoleCursor(false); 
 }
 
@@ -373,21 +371,21 @@ void printBarraY(){
 //----ALGORITMOS DE ODERNACAO---///
 
 // chama a funcao de ordenação
-void visualizarAlgoritmo(char algoritmo[], int vetor[]){
+void visualizarAlgoritmo(char algoritmo[], int vetor[], int velocidade){
 
 	if(strcmp(algoritmo, "Insertion") == 0) //strcmp -> compara duas strings e retorna 0 se forem iguais
-		insertionSort(vetor);
+		insertionSort(vetor, velocidade);
 	else if((strcmp(algoritmo, "Merge") == 0))
-		mergeSort(vetor, 0, TAMANHO-1);
+		mergeSort(vetor, 0, TAMANHO-1, velocidade);
 	else if((strcmp(algoritmo, "Bubble") == 0))
-		bubbleSort(vetor);
+		bubbleSort(vetor, velocidade);
 	else if((strcmp(algoritmo, "Quick") == 0))
-		quickSort(vetor, 0, TAMANHO - 1);
+		quickSort(vetor, 0, TAMANHO - 1, velocidade);
 	
 	GotoXY(0, 0);  // volta o cursor para o inicio após a ordenação
 }
 
-void bubbleSort(int vet[]){
+void bubbleSort(int vet[], int velocidade){
 	int i, j, temp;
 	
 	for(i=0;i<TAMANHO;i++){
@@ -398,12 +396,12 @@ void bubbleSort(int vet[]){
 				vet[j] = vet[j+1];
 				vet[j+1] = temp;
 			}
-			trocarBubble(vet, j, j+1);
+			trocarBubble(vet, j, j+1, velocidade);
 		}
 	}
 }
 
-void insertionSort(int vetor[]){
+void insertionSort(int vetor[], int velocidade){
 	int i, j, key;
 	  
     for (i = 1; i < TAMANHO; i++) {
@@ -416,7 +414,7 @@ void insertionSort(int vetor[]){
             j = j - 1;
             trocarColuna(j+1, key, true);  //e depois. Se fzr os dois juntos o efeito não é tão interessante
             vetor[j + 1] = key;
-            Sleep(VELOCIDADE/2);
+            Sleep(velocidade/2);
         }
     }
 }
@@ -470,18 +468,18 @@ void merge(int a[], int p, int q, int r) {
 }
 
 // Divide the array into two subarrays, sort them and merge them
-void mergeSort(int a[], int l, int r) {
+void mergeSort(int a[], int l, int r, int velocidade) {
 	if (l < r) {
 	    // m is the point where the array is divided into two subarrays
 	    int m = l + (r - l) / 2;
 		
-	    mergeSort(a, l, m);
-	    mergeSort(a, m + 1, r);
+	    mergeSort(a, l, m, velocidade);
+	    mergeSort(a, m + 1, r, velocidade);
 	
 	    // Merge the sorted subarrays
 	    merge(a, l, m, r);
 	    
-	    trocarVetor(a, l, r);
+	    trocarVetor(a, l, r, velocidade);
 	}
 }
 
@@ -512,15 +510,15 @@ int partition(int vet[], int low, int high)
 	return (i + 1); //retorna a posicao do pivot
 }
 
-void quickSort(int vet[], int low, int high)
+void quickSort(int vet[], int low, int high, int velocidade)
 {
 	if(low < high)
 	{
 		int pi = partition(vet, low, high);
-		trocarVetor(vet, low, high);
+		trocarVetor(vet, low, high, velocidade);
 		
-		quickSort(vet, low, pi - 1); 
-		quickSort(vet, pi + 1, high);
+		quickSort(vet, low, pi - 1, velocidade); 
+		quickSort(vet, pi + 1, high, velocidade);
 	}
 }
 //------FUNÇÕES DE VISUALIZAÇÃO DOS ALGORITMOS------//
@@ -588,9 +586,9 @@ void apagarVetor(int l, int r){
 }
 
 // Função usada para trocar os valores das colunas do algoritmo Bubble Sort
-void trocarBubble(int vet[], int l, int r){
+void trocarBubble(int vet[], int l, int r, int velocidade){
 	int i, j;
-	Sleep(VELOCIDADE/4);
+	Sleep(velocidade/4);
 	
 	apagarVetor(l, r);
 	for(i=l;i<=r;i++){
@@ -606,15 +604,15 @@ void trocarBubble(int vet[], int l, int r){
 }
 
 // Troca os valores de um vetor [l...r] alterando a velocidade
-void trocarVetor(int vet[], int l, int r){
+void trocarVetor(int vet[], int l, int r, int velocidade){
 	int i, j;
 	int lenSubvetor = r-l;
 	
 	for(i=l;i<=r;i++){
 		if(lenSubvetor>=TAMANHO/6)
-			Sleep(VELOCIDADE/4);
+			Sleep(velocidade/4);
 		else
-			Sleep(VELOCIDADE/2);
+			Sleep(velocidade/2);
 		
 		trocarColuna(i, vet[i], 1);
 		if(i>0)
