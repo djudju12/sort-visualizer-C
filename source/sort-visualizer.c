@@ -45,6 +45,8 @@ int X_INICIAL;
 // Tamanho maximo da amostra e valor maximo de um valor da amostra
 int MAX_AMOSTRA, VALOR_MAXIMO;
 
+
+
 //assinatura das funções
 void menuAlgoritmo(char algoritmo[]);  //lembrete: fazer alterações para dipensar o uso de ponteiros nos menus
 void mainMenu();
