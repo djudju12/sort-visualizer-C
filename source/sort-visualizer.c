@@ -171,6 +171,7 @@ void menuAlgoritmo(char algoritmo[]){
 
 // A maneira que encontrei para fazer as operações na lista foi convertela para uma lista linkada e depois converter para 
 // um array novamente.
+//--------------------------------QUEBRAR EM FUNÇÕES MENORES-------------------------------//
 void menuAlteracao(int vet[]){
 	bool sair=false;
 	char op;
@@ -186,6 +187,7 @@ void menuAlteracao(int vet[]){
 				index = selecionarIndex(converterVetor(), 2);  // -> seleciona o index com as setas
 				GotoXY(0, OFFSET_Y-1);
 				printf("Novo valor: ");
+				fflush(stdin);
 				scanf("%d", &novo_valor);
 				
 				// caso index -> 0, preciso usar a funcao de remover e adicionar primeiro, nao da pra usar o index -> 0 no adicionar e remover em dado index
@@ -213,6 +215,7 @@ void menuAlteracao(int vet[]){
 				if(lenLinkedList()<MAX_AMOSTRA){
 					GotoXY(0, OFFSET_Y-1);
 					printf("Novo valor: ");
+					fflush(stdin);
 					scanf("%d", &novo_valor);
 					if(novo_valor<=VALOR_MAXIMO && novo_valor>0)
 						adicionarUltimo(novo_valor);
@@ -243,10 +246,7 @@ void imprimir(int a[]){
 	int pular_linha=0;
 	for(i=0;i<TAMANHO;i++){
 		GotoXY(x, OFFSET_Y + pular_linha);
-		if(a[i]<10)
-			printf("0%d", a[i]);
-		else
-			printf("%d", a[i]);
+		printf("%02d", a[i]);
 		x+=3;
 		if(x>=LARGURA_MENU-1){
 			pular_linha++;
@@ -281,7 +281,7 @@ void alterarVelocidade(int *velocidade){
 	ShowConsoleCursor(true);
 	fflush(stdin);
 	scanf("%f", &aux);
-	if((aux>=10) && (aux <= 999))
+	if((aux>=VEL_MIN) && (aux <= VEL_MAX))
 		*velocidade = aux;
 	ShowConsoleCursor(false); 
 }
@@ -300,16 +300,10 @@ int selecionarIndex(int vetor[], int cor){
 		
 		switch(cor){
 			case 1:
-				if(vetor[index]>9)
-					printf(VERMELHO_BG "%d" RESET, vetor[index]);
-				else
-					printf(VERMELHO_BG "0%d" RESET, vetor[index]);
+				printf(VERMELHO_BG "%02d" RESET, vetor[index]);
 				break;
 			case 2:
-				if(vetor[index]>9)
-					printf(VERDE_BG "%d" RESET, vetor[index]);
-				else
-					printf(VERDE_BG "0%d" RESET, vetor[index]);
+				printf(VERDE_BG "%02d" RESET, vetor[index]);
 				break;
 		}
 
@@ -319,10 +313,8 @@ int selecionarIndex(int vetor[], int cor){
 			GotoXY(x,y);
 			// ENTER -> retorna a funcao sem apagar o anterior
 			if(c != ENTER){
-				if(vetor[index]>9)
-					printf("%d", vetor[index]);
-				else
-					printf("0%d", vetor[index]);
+				printf("%02d", vetor[index]);
+
 			}
 			// x+=3 pois sao 3 valores de x-> unidade, dezena e espaço separando o proximo numero
 			switch(c){
@@ -375,13 +367,13 @@ void printBarraY(){
 // chama a funcao de ordenação
 void visualizarAlgoritmo(char algoritmo[], int vetor[], int velocidade){
 
-	if(strcmp(algoritmo, "Insertion") == 0) //strcmp -> compara duas strings e retorna 0 se forem iguais
+	if(!strcmp(algoritmo, "Insertion")) //strcmp -> compara duas strings e retorna 0 se forem iguais
 		insertionSort(vetor, velocidade);
-	else if((strcmp(algoritmo, "Merge") == 0))
+	else if(!strcmp(algoritmo, "Merge"))
 		mergeSort(vetor, 0, TAMANHO-1, velocidade);
-	else if((strcmp(algoritmo, "Bubble") == 0))
+	else if(!strcmp(algoritmo, "Bubble"))
 		bubbleSort(vetor, velocidade);
-	else if((strcmp(algoritmo, "Quick") == 0))
+	else if(!strcmp(algoritmo, "Quick"))
 		quickSort(vetor, 0, TAMANHO - 1, velocidade);
 	
 	GotoXY(0, 0);  // volta o cursor para o inicio após a ordenação
@@ -424,7 +416,7 @@ void insertionSort(int vetor[], int velocidade){
 // fonte -> https://www.programiz.com/dsa/merge-sort
 // deixei os comentários originais 
 // Merge two subarrays L and M into arr
-void merge(int a[], int p, int q, int r) {
+void merge(int a[], int p, int q, int r){
 
 	// Create L ? A[p..q] and M ? A[q+1..r]
 	int n1 = q - p + 1;
@@ -470,7 +462,7 @@ void merge(int a[], int p, int q, int r) {
 }
 
 // Divide the array into two subarrays, sort them and merge them
-void mergeSort(int a[], int l, int r, int velocidade) {
+void mergeSort(int a[], int l, int r, int velocidade){
 	if (l < r) {
 	    // m is the point where the array is divided into two subarrays
 	    int m = l + (r - l) / 2;
@@ -485,15 +477,13 @@ void mergeSort(int a[], int l, int r, int velocidade) {
 	}
 }
 
-void swap(int *a, int *b)
-{
+void swap(int *a, int *b){
 	int t = *a;
 	*a = *b;
 	*b = t;	
 }
 
-int partition(int vet[], int low, int high)
-{
+int partition(int vet[], int low, int high){
 	int pivot = vet[high]; // -> posicao a direita
 	trocarColuna(high, pivot, 3);
 	int i = (low - 1); // -> posicao do menor elemento, essa posicao é guardada para trocar os valores 
@@ -512,8 +502,7 @@ int partition(int vet[], int low, int high)
 	return (i + 1); //retorna a posicao do pivot
 }
 
-void quickSort(int vet[], int low, int high, int velocidade)
-{
+void quickSort(int vet[], int low, int high, int velocidade){
 	if(low < high)
 	{
 		int pi = partition(vet, low, high);
@@ -639,5 +628,9 @@ int* gerarVetor(){
 	
 	return vetor;
 }
+
+//-----TESTES-----///
+
+
 
 
