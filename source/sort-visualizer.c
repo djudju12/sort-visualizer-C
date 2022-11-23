@@ -1,78 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <windows.h>
-#include <string.h>
-#include <stdbool.h>
-#include <conio.h>
-#include "linkedlist.h"
-#include "console.h"
-
-#define MIN_AMOSTRA 5 //tamanho minimo da amostra
-#define CARACTERE 219
-#define LARGURA_MENU 40
-#define OFFSET_X 4
-#define OFFSET_Y 9
-#define BARRA_Y 186
-#define VEL_MIN 10
-#define VEL_MAX 999
-
-//teclas ASCII
-#define K_D 80
-#define K_U 72
-#define K_L 75
-#define K_R 77
-#define ENTER 13
-
-
-//Para trocar a cor das colunas no terminal
-#define VERMELHO "\x1b[31m"
-#define VERDE "\x1b[32m"
-#define AZUL "\x1b[34m"
-#define RESET "\x1b[0m"
-
-//Para trocar a cor do background no terminal
-#define VERMELHO_BG "\x001b[41;1m"
-#define VERDE_BG "\x001b[42;1m"
-
-//----VARIAVEIS GLOBAIS----//
-// Dimensões
-int D_X, D_Y;
-// Tamanho da amostra
-int TAMANHO=20;
-// Coordenada onde começa a impressão do vetor gráfico
-int X_INICIAL;
-// Tamanho maximo da amostra e valor maximo de um valor da amostra
-int MAX_AMOSTRA, VALOR_MAXIMO;
-
-
-
-//assinatura das funções
-void menuAlgoritmo(char algoritmo[]);  //lembrete: fazer alterações para dipensar o uso de ponteiros nos menus
-void mainMenu();
-int* gerarVetor();
-void visualizarAlgoritmo(char algoritmo[], int vetor[], int velocidade);
-void alterarTamanho(); 
-void visualizarVetor(int vet[]);
-void insertionSort(int a[], int velocidade);
-void mergeSort(int a[], int l, int r, int velocidade);
-void trocarColuna(int index, int valor_atual, int cor);
-void imprimir(int a[]);
-void trocarVetor(int vet[], int l, int r, int velocidade);
-void apagarVetor(int l, int r);
-void menuAlteracao(int vet[]);
-void printBarraY();
-void imprimir(int a[]);
-int selecionarIndex(int vetor[], int cor);
-void reprint(int vetor[]);
-void trocarBubble(int vet[], int l, int r, int velocidade);
-void imprimirLayout(int vet[]);
-void apagarColuna(int index);
-void alterarVelocidade(int *velocidade);
-void quickSort(int vet[], int low, int high, int velocidade);
-int partition(int vet[], int low, int high);
-void swap(int *a, int *b);
-void bubbleSort(int vet[], int velocidade);
+#include "sort-visualizer.h"
 
 //FUNÇÃO PRINCIPAL 
 int main(){
@@ -171,7 +97,6 @@ void menuAlgoritmo(char algoritmo[]){
 
 // A maneira que encontrei para fazer as operações na lista foi convertela para uma lista linkada e depois converter para 
 // um array novamente.
-//--------------------------------QUEBRAR EM FUNÇÕES MENORES-------------------------------//
 void menuAlteracao(int vet[]){
 	bool sair=false;
 	char op;
@@ -185,38 +110,17 @@ void menuAlteracao(int vet[]){
 		switch(op){
 			case '1':
 				index = selecionarIndex(converterVetor(), 2);  // -> seleciona o index com as setas
-				GotoXY(0, OFFSET_Y-1);
-				printf("Novo valor: ");
-				fflush(stdin);
-				scanf("%d", &novo_valor);
-				
-				// caso index -> 0, preciso usar a funcao de remover e adicionar primeiro, nao da pra usar o index -> 0 no adicionar e remover em dado index
-				if(novo_valor<=VALOR_MAXIMO && novo_valor>0){
-					if(index == 0){  
-						removerPrimeiro();
-						adicionarPrimeiro(novo_valor);
-					}
-					else{
-						remover(index);
-						adicionar(index, novo_valor);
-					}
-				}
+				substituirValor(index);
 				break;
 			case '2':
 				if(lenLinkedList()>MIN_AMOSTRA){
 					index = selecionarIndex(converterVetor(), 1);
-					if(index == 0)
-						removerPrimeiro();
-					else
-						remover(index);
+					removerValor(index);
 				}
 				break;
 			case '3':
 				if(lenLinkedList()<MAX_AMOSTRA){
-					GotoXY(0, OFFSET_Y-1);
-					printf("Novo valor: ");
-					fflush(stdin);
-					scanf("%d", &novo_valor);
+					novo_valor = receberValor(0, OFFSET_Y-1);
 					if(novo_valor<=VALOR_MAXIMO && novo_valor>0)
 						adicionarUltimo(novo_valor);
 				}
@@ -230,6 +134,42 @@ void menuAlteracao(int vet[]){
 		TAMANHO = lenLinkedList();
 		X_INICIAL = LARGURA_MENU + (D_X-LARGURA_MENU-TAMANHO)/2;
 	}while(sair==false);
+}
+
+void removerValor(int index){
+	if(index == 0)
+		removerPrimeiro();
+	else
+		remover(index);
+}
+
+int receberValor(int posx, int posy){
+	int novo_valor;
+	
+	GotoXY(posx, posy);
+	printf("Novo valor: ");
+	ShowConsoleCursor(true);
+	fflush(stdin);
+	scanf("%d", &novo_valor);
+	ShowConsoleCursor(false);
+
+	return novo_valor;
+}
+
+void substituirValor(int index){
+	int novo_valor;
+	novo_valor = receberValor(0, OFFSET_Y-1);	
+	// caso index -> 0, preciso usar a funcao de remover e adicionar primeiro, nao da pra usar o index -> 0 no adicionar e remover em dado index
+	if(novo_valor<=VALOR_MAXIMO && novo_valor>0){
+		if(index == 0){  
+			removerPrimeiro();
+			adicionarPrimeiro(novo_valor);
+		}
+		else{
+			remover(index);
+			adicionar(index, novo_valor);
+		}
+	}
 }
 
 void imprimirLayout(int vet[]){
@@ -259,15 +199,10 @@ void imprimir(int a[]){
 // Altera o tamanho da amostra
 void alterarTamanho(){
 	int coord_x = 0, coord_y = OFFSET_Y-1, aux;
- 
-	GotoXY(coord_x, coord_y);
-	printf(VERMELHO "(%d - %d) -> " RESET, MIN_AMOSTRA, MAX_AMOSTRA);
-	ShowConsoleCursor(true);
-	fflush(stdin);
-	scanf("%d", &aux);
+
+	aux = receberValor(coord_x, coord_y);
 	if((aux >= MIN_AMOSTRA) && (aux <= MAX_AMOSTRA))
 		TAMANHO = aux;
-	ShowConsoleCursor(false); 
 	// redefiniçao
 	X_INICIAL = LARGURA_MENU + (D_X-LARGURA_MENU-TAMANHO)/2;
 }
@@ -275,15 +210,10 @@ void alterarTamanho(){
 void alterarVelocidade(int *velocidade){
 	int coord_x = 0, coord_y = OFFSET_Y-1;
 	float aux;
- 
-	GotoXY(coord_x, coord_y);
-	printf(VERMELHO "(%d%% - %d%%) -> " RESET, VEL_MIN, VEL_MAX);
-	ShowConsoleCursor(true);
-	fflush(stdin);
-	scanf("%f", &aux);
+	
+	aux = receberValor(coord_x, coord_y);
 	if((aux>=VEL_MIN) && (aux <= VEL_MAX))
 		*velocidade = aux;
-	ShowConsoleCursor(false); 
 }
 
 
@@ -312,10 +242,8 @@ int selecionarIndex(int vetor[], int cor){
 			trocarColuna(index, vetor[index], false);
 			GotoXY(x,y);
 			// ENTER -> retorna a funcao sem apagar o anterior
-			if(c != ENTER){
+			if(c != ENTER)
 				printf("%02d", vetor[index]);
-
-			}
 			// x+=3 pois sao 3 valores de x-> unidade, dezena e espaço separando o proximo numero
 			switch(c){
 				case ENTER:
