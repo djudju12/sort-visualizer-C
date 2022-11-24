@@ -55,6 +55,7 @@ void menuAlgoritmo(char algoritmo[]){
 	char opc, controle='1';
 	int *vetor;
 	int velocidade = 100;
+	bool sair = false;
 	
 	vetor = gerarVetor();
 	do{
@@ -86,12 +87,12 @@ void menuAlgoritmo(char algoritmo[]){
 					break;
 				case '6':
 					system("cls");
-					controle = '0';
+					sair = true;
 					break;
 				default:
 					system("cls");  // -> se a tela nao for limpa sempre, ela buga (?!)
 			}
-	}while(controle=='1');
+	}while(sair==false);
 	free(vetor); 
 }
 
