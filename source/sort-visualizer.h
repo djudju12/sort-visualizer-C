@@ -77,6 +77,8 @@ void bubbleSort(int vet[], int velocidade);
 void substituirValor(int index);
 int receberValor(int posx, int posy);
 void removerValor(int index);
+void quickSort3(int *vet, int l, int r, int velocidade);
+int p3(int *vet, int left, int right, int *lt, int *gt);
 
 #endif
 

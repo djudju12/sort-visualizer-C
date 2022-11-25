@@ -27,27 +27,30 @@ void mainMenu(){
 	
 	do{
 	//Menu inicial
-	printf("Bem-vindo ao visualizador de algoritmos de ordenacao\n");
-	printf("<1> Insertion Sort\n<2> Merge Sort\n<3> Bubble Sort\n<4> Quick Sort\n<5> Sair\n");
-	opc=getch();
-		switch(opc){
-			case '1':
-				menuAlgoritmo("Insertion");
-				break;
-			case '2':
-				menuAlgoritmo("Merge");
-				break;
-			case '3':
-				menuAlgoritmo("Bubble");
-				break;
-			case '4':
-				menuAlgoritmo("Quick");
-				break;
-			case '5':
-				exit(0);
-			default:
-				system("cls"); //-> se nao limpar a tela buga!
-		}
+		printf("Bem-vindo ao visualizador de algoritmos de ordenacao\n");
+		printf("<1> Insertion Sort\n<2> Merge Sort\n<3> Bubble Sort\n<4> Quick Sort\n<5> 3-Way Quick Sort\n<6> Sair\n");
+		opc=getch();
+			switch(opc){
+				case '1':
+					menuAlgoritmo("Insertion");
+					break;
+				case '2':
+					menuAlgoritmo("Merge");
+					break;
+				case '3':
+					menuAlgoritmo("Bubble");
+					break;
+				case '4':
+					menuAlgoritmo("Quick");
+					break;
+				case '5':
+					menuAlgoritmo("3Quick");
+					break;
+				case '6':
+					exit(0);
+				default:
+					system("cls"); //-> se nao limpar a tela buga!
+			}
 	}while(1);
 }
 
@@ -56,13 +59,13 @@ void menuAlgoritmo(char algoritmo[]){
 	int *vetor;
 	int velocidade = 100;
 	bool sair = false;
-	
+
 	vetor = gerarVetor();
 	do{
 		imprimirLayout(vetor);
-		//Menu que será mostrado após selecionar um dos algoritmos
 		printf("Algoritmo selecionado: %s Sort\nTamanho da amostra: %d\tVelocidade: %d%%\n", algoritmo, TAMANHO, velocidade);
 		printf("<1> Iniciar ordenacao\n<2> Alterar tamanho\n<3> Alterar velocidade\n<4> Modificar amostra\n<5> Gerar nova amostra aleatoria\n<6> Voltar\n");
+		//Menu que será mostrado após selecionar um dos algoritmos
 		opc=getch();
 		
 			switch(opc){
@@ -82,7 +85,7 @@ void menuAlgoritmo(char algoritmo[]){
 					freeList();  // libera a memoria ocupada pela lista linkada
 					break;
 				case '5':
-					apagarVetor(0, TAMANHO);
+					free(vetor);
 					vetor = gerarVetor();
 					break;
 				case '6':
@@ -101,8 +104,7 @@ void menuAlgoritmo(char algoritmo[]){
 void menuAlteracao(int vet[]){
 	bool sair=false;
 	char op;
-	int index, novo_valor;
-
+	int index, novo_valor=1;
 	copy(vet, TAMANHO);  // -> converte o vetor para uma lista linkada para realizara as operaçoes	
 	do{
 		imprimirLayout(converterVetor());
@@ -206,6 +208,7 @@ void alterarTamanho(){
 		TAMANHO = aux;
 	// redefiniçao
 	X_INICIAL = LARGURA_MENU + (D_X-LARGURA_MENU-TAMANHO)/2;
+	system("cls");
 }
 
 void alterarVelocidade(int *velocidade){
@@ -304,6 +307,8 @@ void visualizarAlgoritmo(char algoritmo[], int vetor[], int velocidade){
 		bubbleSort(vetor, velocidade);
 	else if(!strcmp(algoritmo, "Quick"))
 		quickSort(vetor, 0, TAMANHO - 1, velocidade);
+	else if(!strcmp(algoritmo, "3Quick"))
+		quickSort3(vetor, 0, TAMANHO - 1, velocidade);
 	
 	GotoXY(0, 0);  // volta o cursor para o inicio após a ordenação
 }
@@ -441,6 +446,40 @@ void quickSort(int vet[], int low, int high, int velocidade){
 		quickSort(vet, pi + 1, high, velocidade);
 	}
 }
+
+int p3(int *vet, int left, int right, int *lt, int *gt)
+{
+	int i = left;
+	int pivot = vet[right];
+	trocarColuna(right, pivot, 3);
+
+	while (i <= right){
+		if (vet[i] < pivot){
+			swap(&vet[left++], &vet[i++]);
+		}
+		else if (vet[i] == pivot){
+			i++;
+		}
+		else if (vet[i] > pivot){
+			swap(&vet[i], &vet[right--]);
+		}
+		
+	}
+	*lt = left - 1;
+	*gt = i;
+}
+
+void quickSort3(int *vet, int l, int r, int velocidade){
+	if (l >= r)
+		return;
+	int lt, gt;
+	
+	p3(vet, l, r, &lt, &gt);
+	trocarVetor(vet, l, r, velocidade);
+	quickSort3(vet, l, lt, velocidade);
+	quickSort3(vet, gt, r, velocidade);
+}
+	
 //------FUNÇÕES DE VISUALIZAÇÃO DOS ALGORITMOS------//
 
 //imprime o vetor inteiro
@@ -559,6 +598,7 @@ int* gerarVetor(){
 }
 
 //-----TESTES-----///
+
 
 
 
