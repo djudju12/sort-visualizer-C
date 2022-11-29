@@ -596,10 +596,3 @@ int* gerarVetor(){
 	
 	return vetor;
 }
-
-//-----TESTES-----///
-
-
-
-
-
