@@ -1,3 +1,9 @@
+/*
+	Trabalho de Programação P/ Resolução de Problemas - Visualizador de algoritmos
+	Alunos: Jonathan Santos,
+	Data: 06/12/2022
+*/
+
 #include "sort-visualizer.h"
 
 //FUNÇÃO PRINCIPAL 
@@ -7,12 +13,12 @@ int main(){
 	maximize_window(); 
 	get_size_window(&dimensoes.dx, &dimensoes.dy);
 	ShowConsoleCursor(false);
+	MAX_AMOSTRA = dimensoes.dx - LARGURA_MENU - OFFSET_X;
+	TAMANHO = MAX_AMOSTRA/2;
+	X_INICIAL = LARGURA_MENU + (dimensoes.dx-LARGURA_MENU-TAMANHO)/2; // posicao do X que a primeira barra vai ser printada
+	VALOR_MAXIMO = dimensoes.dy - 1;  								  // valor maximo de cada item da amostra
+	(VALOR_MAXIMO > 99 ? VALOR_MAXIMO = 99 : VALOR_MAXIMO);  		  // ajudas o valor maximo para não ser maior do que 99
 	
-	X_INICIAL = LARGURA_MENU + (dimensoes.dx-LARGURA_MENU-TAMANHO)/2; // -> começa a impressao das barras
-	MAX_AMOSTRA = dimensoes.dx - LARGURA_MENU - OFFSET_X;  // -> tamanho maximo da amostra
-	VALOR_MAXIMO = dimensoes.dy - 1;  // ->  valor maximo de cada item da amostra
-	(VALOR_MAXIMO > 99 ? VALOR_MAXIMO = 99 : VALOR_MAXIMO);
-
 	// começa o programa
 	mainMenu();
 	
@@ -21,11 +27,13 @@ int main(){
 
 
 //----FUNÇÕES DO MENU----//
+
+// Menu inicial
 void mainMenu(){
 	char opc;
+	bool sair = false;
 	
 	do{
-	//Menu inicial
 		printf("Bem-vindo ao visualizador de algoritmos de ordenacao\n");
 		printf("<1> Insertion Sort\n<2> Merge Sort\n<3> Bubble Sort\n<4> Quick Sort\n<5> 3-Way Quick Sort\n<6> Sair\n");
 		opc=getch();
@@ -43,36 +51,39 @@ void mainMenu(){
 					menuAlgoritmo("Quick");
 					break;
 				case '5':
-					menuAlgoritmo("3Quick");
+					menuAlgoritmo("3-Way Quick");
 					break;
 				case '6':
-					exit(0);
+					sair = true;
+					break;
 				default:
-					system("cls"); //-> se nao limpar a tela buga!
+					system("cls"); 
 			}
-	}while(1);
+	}while(sair == false);
 }
 
+// Menu que será mostrado após selecionar um dos algoritmos
 void menuAlgoritmo(char algoritmo[]){
-	char opc, controle='1';
+	char opc;
 	int *vetor;
 	int velocidade = 100;
 	bool sair = false;
 
 	vetor = gerarVetor();
 	do{
-		imprimirLayout(vetor);
+		imprimirLayout(vetor); 
 		printf("Algoritmo selecionado: %s Sort\nTamanho da amostra: %d\tVelocidade: %d%%\n", algoritmo, TAMANHO, velocidade);
 		printf("<1> Iniciar ordenacao\n<2> Alterar tamanho\n<3> Alterar velocidade\n<4> Modificar amostra\n<5> Gerar nova amostra aleatoria\n<6> Voltar\n");
-		//Menu que será mostrado após selecionar um dos algoritmos
+
 		opc=getch();
-		
 			switch(opc){
 				case '1':
 					visualizarAlgoritmo(algoritmo, vetor, velocidade);
 					break;
 				case '2':
-					alterarTamanho();
+					// altera a variavel TAMANHO, libera a memoria que o vetor anterior usava e gera um novo vetor com o novo TAMANHO
+					alterarTamanho(); 
+					free(vetor);
 					vetor = gerarVetor(TAMANHO);
 					break;
 				case '3':
@@ -92,35 +103,36 @@ void menuAlgoritmo(char algoritmo[]){
 					sair = true;
 					break;
 				default:
-					system("cls");  // -> se a tela nao for limpa sempre, ela buga (?!)
+					system("cls");  
 			}
 	}while(sair==false);
 	free(vetor); 
 }
 
-
 void menuAlteracao(int vet[]){
 	bool sair=false;
 	char op;
 	int index, novo_valor=1;
-	copy(vet, TAMANHO);  // -> converte o vetor para uma lista linkada para realizara as operaçoes
-	free(vet);
+	copy(vet, TAMANHO);		// converte o vetor para uma lista linkada para realizara as operaçoes
+	free(vet);				// libera a memoria ocupada por vet pois outro vetor será gerado
 	do{
 		imprimirLayout(converterVetor());
 		printf("<1> Substituir\n<2> Remover\n<3> Adicionar\n<4> Voltar\n\nValor minimo: %d\nValor maximo: %d", 1, VALOR_MAXIMO);
 		op = getch();
 		switch(op){
 			case '1':
-				index = selecionarIndex(converterVetor(), 2);  // -> seleciona o index com as setas
+				index = selecionarIndex(converterVetor(), 2); 
 				substituirValor(index);
 				break;
 			case '2':
+				// se o tamanho da lista for maior que o valor minimo
 				if(lenLinkedList()>MIN_AMOSTRA){
 					index = selecionarIndex(converterVetor(), 1);
 					removerValor(index);
 				}
 				break;
 			case '3':
+				// checa se a lista já não atingiu o maximo de valores e se o VALOR_MAXIMO > novo_valor > 0
 				if(lenLinkedList()<MAX_AMOSTRA){
 					novo_valor = receberValor(0, OFFSET_Y-1);
 					if(novo_valor<=VALOR_MAXIMO && novo_valor>0)
@@ -160,8 +172,9 @@ int receberValor(int posx, int posy){
 
 void substituirValor(int index){
 	int novo_valor;
-	novo_valor = receberValor(0, OFFSET_Y-1);	
-	// caso index -> 0, preciso usar a funcao de remover e adicionar primeiro, nao da pra usar o index -> 0 no adicionar e remover em dado index
+	novo_valor = receberValor(0, OFFSET_Y-1); 
+	
+	// checa se o valor é valido e se o index == 0 
 	if(novo_valor<=VALOR_MAXIMO && novo_valor>0){
 		if(index == 0){  
 			removerPrimeiro();
@@ -177,22 +190,25 @@ void substituirValor(int index){
 void imprimirLayout(int vet[]){
 	system("cls");
 	visualizarVetor(vet);  // -> barras
-	printBarraY();  // -> barra vertical do menu
-	imprimir(vet);  // -> vetor numérico
+	printBarraY();  	   // -> barra vertical do menu
+	imprimir(vet);  	   // -> vetor numérico
 }
 
 // imprime o vetor numério abaixo do menu.
 void imprimir(int a[]){
-	int x=0, i;
+	int caracteres=0, i;
 	
 	int pular_linha=0;
 	for(i=0;i<TAMANHO;i++){
-		GotoXY(x, OFFSET_Y + pular_linha);
+		
+		GotoXY(caracteres, OFFSET_Y + pular_linha);
 		printf("%02d", a[i]);
-		x+=3;
-		if(x>=LARGURA_MENU-1){
+		caracteres+=3;	  // contagem de caracteres impressos
+		
+		// quando chegar no final do menu, pula linha 
+		if(caracteres>=LARGURA_MENU-1){
 			pular_linha++;
-			x = 0;
+			caracteres = 0;
 		}
 	}
 	GotoXY(0, 0);
@@ -205,6 +221,7 @@ void alterarTamanho(){
 	aux = receberValor(coord_x, coord_y);
 	if((aux >= MIN_AMOSTRA) && (aux <= MAX_AMOSTRA))
 		TAMANHO = aux;
+		
 	// redefiniçao
 	X_INICIAL = LARGURA_MENU + (dimensoes.dx-LARGURA_MENU-TAMANHO)/2;
 	system("cls");
@@ -226,7 +243,7 @@ int selecionarIndex(int vetor[], int cor){
 	char c;
 	bool parar = false;
 	
-	trocarColuna(index, vetor[index], true); 
+	trocarColuna(index, vetor[index], true); // printa em vermelho a barra do valor da posicao index  
 	// Quando um botão é pressionado, apaga o anterior e printa o background no novo index
 	while(parar==false){
 		GotoXY(x,y);
@@ -247,7 +264,8 @@ int selecionarIndex(int vetor[], int cor){
 			// ENTER -> retorna a funcao sem apagar o anterior
 			if(c != ENTER)
 				printf("%02d", vetor[index]);
-			// x+=3 pois sao 3 valores de x-> unidade, dezena e espaço separando o proximo numero
+			// x+=3 pois sao 3 caracteres separando o proximo numero
+			// y controla a linha
 			switch(c){
 				case ENTER:
 					parar = true;
@@ -277,7 +295,7 @@ int selecionarIndex(int vetor[], int cor){
 					break;
 					}
 				}
-			trocarColuna(index, vetor[index], true);
+			trocarColuna(index, vetor[index], true);  // toda vez que uma das setas é apertada um novo index é selecionado e destacado em vermelho
 		}
 	}
 	return index;
@@ -306,7 +324,7 @@ void visualizarAlgoritmo(char algoritmo[], int vetor[], int velocidade){
 		bubbleSort(vetor, velocidade);
 	else if(!strcmp(algoritmo, "Quick"))
 		quickSort(vetor, 0, TAMANHO - 1, velocidade);
-	else if(!strcmp(algoritmo, "3Quick"))
+	else if(!strcmp(algoritmo, "3-Way Quick"))
 		quickSort3(vetor, 0, TAMANHO - 1, velocidade);
 	
 	GotoXY(0, 0);  // volta o cursor para o inicio após a ordenação
@@ -336,10 +354,10 @@ void insertionSort(int vetor[], int velocidade){
         key = vetor[i];
         j = i - 1;
         while (j >= 0 && vetor[j] > key) {
-        	trocarColuna(j+1, vetor[j], false);  //swap é feito antes
+        	trocarColuna(j+1, vetor[j], false); 
             vetor[j + 1] = vetor[j];
             j = j - 1;
-            trocarColuna(j+1, key, true);  //e depois. Se fzr os dois juntos o efeito não é tão interessante
+            trocarColuna(j+1, key, true);  
             vetor[j + 1] = key;
             Sleep(velocidade/2);
         }
@@ -417,9 +435,9 @@ void swap(int *a, int *b){
 }
 
 int partition(int vet[], int low, int high){
-	int pivot = vet[high]; // -> posicao a direita
+	int pivot = vet[high]; 			// -> posicao a direita
 	trocarColuna(high, pivot, 3);
-	int i = (low - 1); // -> posicao do menor elemento, essa posicao é guardada para trocar os valores 
+	int i = (low - 1); 				// -> posicao do menor elemento, essa posicao é guardada para trocar os valores 
 	int j;
 	
 	for(j = low; j <= high - 1; j++)
@@ -430,9 +448,9 @@ int partition(int vet[], int low, int high){
 			swap(&vet[i], &vet[j]); // coloca todos os numeros menores que o pivo para a esquerda
 		}
 	}
-	swap(&vet[i + 1], &vet[high]);  //a posicao i+1 é a posicao do primeiro valor que é maior ou igual ao pivo, essa instrução posiciona o pivo no lugar correto
-	// assim, os valores maiores estarão para a direita e os menores estarão para a esquerda
-	return (i + 1); //retorna a posicao do pivot
+	swap(&vet[i + 1], &vet[high]);  // a posicao i+1 é a posicao do primeiro valor que é maior ou igual ao pivo, essa instrução posiciona o pivo no lugar correto
+									// assim, os valores maiores estarão para a direita e os menores estarão para a esquerda
+	return (i + 1); 				// retorna a posicao do pivot
 }
 
 void quickSort(int vet[], int low, int high, int velocidade){
@@ -535,12 +553,8 @@ void apagarColuna(int index){
 void apagarVetor(int l, int r){
 	int i, j;
 	
-	for(i=l;i<r;i++){
-		for(j=0;j<=VALOR_MAXIMO;j++){
-			GotoXY(X_INICIAL+i, dimensoes.dy-j-1);
-			printf(" ");
-		}
-	}
+	for(i=l;i<r;i++)
+		apagarColuna(i);
 }
 
 // Função usada para trocar os valores das colunas do algoritmo Bubble Sort
@@ -566,6 +580,7 @@ void trocarVetor(int vet[], int l, int r, int velocidade){
 	int i, j;
 	int lenSubvetor = r-l;
 	
+	// se o vetor for >= 1/6 do tamanho o tempo do Sleep é diminuido
 	for(i=l;i<=r;i++){
 		if(lenSubvetor>=TAMANHO/6)
 			Sleep(velocidade/4);
