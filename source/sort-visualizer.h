@@ -40,13 +40,20 @@
 
 //----VARIAVEIS GLOBAIS----//
 // Dimensões
-int D_X, D_Y;
+typedef struct tela{
+	int dx;
+	int dy;
+}TELA;
+TELA dimensoes;
+
 // Tamanho da amostra
 int TAMANHO=20;
 // Coordenada onde começa a impressão do vetor gráfico
 int X_INICIAL;
 // Tamanho maximo da amostra e valor maximo de um valor da amostra
 int MAX_AMOSTRA, VALOR_MAXIMO;
+
+
 
 //assinatura das funções
 void menuAlgoritmo(char algoritmo[]);  //lembrete: fazer alterações para dipensar o uso de ponteiros nos menus

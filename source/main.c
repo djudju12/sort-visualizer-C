@@ -4,15 +4,14 @@
 int main(){
 	
 	maximize_window();
-	get_size_window(&D_X, &D_Y);
+	get_size_window(&dimensoes.dx, &dimensoes.dy);
 	ShowConsoleCursor(false);
 	
 	//definições iniciais
-	X_INICIAL = LARGURA_MENU + (D_X-LARGURA_MENU-TAMANHO)/2; // -> começa a impressao das barras
-	MAX_AMOSTRA = D_X - LARGURA_MENU - OFFSET_X;  // -> tamanho maximo da amostra
-	VALOR_MAXIMO = D_Y - 1;  // ->  valor maximo de cada item da amostra
-	if(VALOR_MAXIMO>99)
-		VALOR_MAXIMO = 99;
+	X_INICIAL = LARGURA_MENU + (dimensoes.dx-LARGURA_MENU-TAMANHO)/2; // -> começa a impressao das barras
+	MAX_AMOSTRA = dimensoes.dx - LARGURA_MENU - OFFSET_X;  // -> tamanho maximo da amostra
+	VALOR_MAXIMO = dimensoes.dy - 1;  // ->  valor maximo de cada item da amostra
+	(VALOR_MAXIMO > 99 ? VALOR_MAXIMO = 99 : VALOR_MAXIMO);
 
 	// começa o programa
 	mainMenu();
@@ -135,7 +134,7 @@ void menuAlteracao(int vet[]){
 		}
 		// redefinição dos valores 
 		TAMANHO = lenLinkedList();
-		X_INICIAL = LARGURA_MENU + (D_X-LARGURA_MENU-TAMANHO)/2;
+		X_INICIAL = LARGURA_MENU + (dimensoes.dx-LARGURA_MENU-TAMANHO)/2;
 	}while(sair==false);
 }
 
@@ -207,7 +206,7 @@ void alterarTamanho(){
 	if((aux >= MIN_AMOSTRA) && (aux <= MAX_AMOSTRA))
 		TAMANHO = aux;
 	// redefiniçao
-	X_INICIAL = LARGURA_MENU + (D_X-LARGURA_MENU-TAMANHO)/2;
+	X_INICIAL = LARGURA_MENU + (dimensoes.dx-LARGURA_MENU-TAMANHO)/2;
 	system("cls");
 }
 
@@ -232,14 +231,24 @@ int selecionarIndex(int vetor[], int cor){
 	while(parar==false){
 		GotoXY(x,y);
 		
-		switch(cor){
+//		switch(cor){
+//			case 1:
+//				printf(VERMELHO_BG "%02d" RESET, vetor[index]);
+//				break;
+//			case 2:
+//				printf(VERDE_BG "%02d" RESET, vetor[index]);
+//				break;
+//		}
+		
+				switch(cor){
 			case 1:
-				printf(VERMELHO_BG "%02d" RESET, vetor[index]);
+				printf("%s" "%02d" "%s", VERMELHO_BG, RESET, vetor[index]);
 				break;
 			case 2:
-				printf(VERDE_BG "%02d" RESET, vetor[index]);
+				printf("%s %02d %s", VERDE_BG, RESET, vetor[index]);
 				break;
 		}
+
 
 		if(kbhit()){
 			c = getch();
@@ -287,7 +296,7 @@ int selecionarIndex(int vetor[], int cor){
 void printBarraY(){
 	int i;
 	
-	for(i=0;i<=D_Y;i++){
+	for(i=0;i<=dimensoes.dy;i++){
 		GotoXY(LARGURA_MENU, i);
 		printf("%c", BARRA_Y);
 	}
@@ -489,7 +498,7 @@ void visualizarVetor(int vet[]){
 	
 	for(i=0;i<TAMANHO;i++){
 		for(j=0;j<vet[i];j++){
-			GotoXY(X_INICIAL+i, D_Y-j-1);
+			GotoXY(X_INICIAL+i, dimensoes.dy-j-1);
 			printf("%c", CARACTERE);
 		}
 	}
@@ -504,7 +513,7 @@ void trocarColuna(int index, int valor_atual, int cor){
 	apagarColuna(index);
 	
 	for(i=0;i<valor_atual;i++){
-		GotoXY(X_INICIAL+index, D_Y-i-1);
+		GotoXY(X_INICIAL+index, dimensoes.dy-i-1);
 		switch(cor){
 			case 0:
 				printf("%c", CARACTERE);
@@ -527,7 +536,7 @@ void apagarColuna(int index){
 	int i;
 	
 	for(i=0;i<VALOR_MAXIMO;i++){
-		GotoXY(X_INICIAL+index, D_Y-i-1);
+		GotoXY(X_INICIAL+index, dimensoes.dy-i-1);
 		printf(" ");
 	}
 }
@@ -538,7 +547,7 @@ void apagarVetor(int l, int r){
 	
 	for(i=l;i<r;i++){
 		for(j=0;j<=VALOR_MAXIMO;j++){
-			GotoXY(X_INICIAL+i, D_Y-j-1);
+			GotoXY(X_INICIAL+i, dimensoes.dy-j-1);
 			printf(" ");
 		}
 	}
@@ -552,7 +561,7 @@ void trocarBubble(int vet[], int l, int r, int velocidade){
 	apagarVetor(l, r);
 	for(i=l;i<=r;i++){
 		for(j=0;j<vet[i];j++){
-			GotoXY(X_INICIAL+i, D_Y-j-1);
+			GotoXY(X_INICIAL+i, dimensoes.dy-j-1);
 			if(i==r)
 				printf(VERMELHO "%c" RESET, CARACTERE);
 			else
