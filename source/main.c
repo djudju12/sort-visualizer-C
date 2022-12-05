@@ -3,28 +3,16 @@
 //FUNÇÃO PRINCIPAL 
 int main(){
 	
-<<<<<<< HEAD
-	maximize_window();
+	// Configurações iniciais
+	maximize_window(); 
 	get_size_window(&dimensoes.dx, &dimensoes.dy);
 	ShowConsoleCursor(false);
 	
-	//definições iniciais
 	X_INICIAL = LARGURA_MENU + (dimensoes.dx-LARGURA_MENU-TAMANHO)/2; // -> começa a impressao das barras
 	MAX_AMOSTRA = dimensoes.dx - LARGURA_MENU - OFFSET_X;  // -> tamanho maximo da amostra
 	VALOR_MAXIMO = dimensoes.dy - 1;  // ->  valor maximo de cada item da amostra
-	(VALOR_MAXIMO > 99 ? VALOR_MAXIMO = 99 : VALOR_MAXIMO);
-=======
-	// Configurações iniciais
-	maximize_window(); 
-	get_size_window(&D_X, &D_Y);
-	ShowConsoleCursor(false);
-	
-	X_INICIAL = LARGURA_MENU + (D_X-LARGURA_MENU-TAMANHO)/2; // -> começa a impressao das barras
-	MAX_AMOSTRA = D_X - LARGURA_MENU - OFFSET_X;  // -> tamanho maximo da amostra
-	VALOR_MAXIMO = D_Y - 1;  // ->  valor maximo de cada item da amostra
 	if(VALOR_MAXIMO>99)
 		VALOR_MAXIMO = 99;
->>>>>>> a7b8570c2347ea028a1cd9bf1f5a669b354daa4a
 
 	// começa o programa
 	mainMenu();
@@ -244,24 +232,14 @@ int selecionarIndex(int vetor[], int cor){
 	while(parar==false){
 		GotoXY(x,y);
 		
-//		switch(cor){
-//			case 1:
-//				printf(VERMELHO_BG "%02d" RESET, vetor[index]);
-//				break;
-//			case 2:
-//				printf(VERDE_BG "%02d" RESET, vetor[index]);
-//				break;
-//		}
-		
-				switch(cor){
+		switch(cor){
 			case 1:
-				printf("%s" "%02d" "%s", VERMELHO_BG, RESET, vetor[index]);
+				printf(VERMELHO_BG "%02d" RESET, vetor[index]);
 				break;
 			case 2:
-				printf("%s %02d %s", VERDE_BG, RESET, vetor[index]);
+				printf(VERDE_BG "%02d" RESET, vetor[index]);
 				break;
 		}
-
 
 		if(kbhit()){
 			c = getch();
