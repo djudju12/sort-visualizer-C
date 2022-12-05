@@ -11,8 +11,7 @@ int main(){
 	X_INICIAL = LARGURA_MENU + (dimensoes.dx-LARGURA_MENU-TAMANHO)/2; // -> começa a impressao das barras
 	MAX_AMOSTRA = dimensoes.dx - LARGURA_MENU - OFFSET_X;  // -> tamanho maximo da amostra
 	VALOR_MAXIMO = dimensoes.dy - 1;  // ->  valor maximo de cada item da amostra
-	if(VALOR_MAXIMO>99)
-		VALOR_MAXIMO = 99;
+	(VALOR_MAXIMO > 99 ? VALOR_MAXIMO = 99 : VALOR_MAXIMO);
 
 	// começa o programa
 	mainMenu();
