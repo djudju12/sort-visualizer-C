@@ -3,6 +3,7 @@
 //FUNÇÃO PRINCIPAL 
 int main(){
 	
+<<<<<<< HEAD
 	maximize_window();
 	get_size_window(&dimensoes.dx, &dimensoes.dy);
 	ShowConsoleCursor(false);
@@ -12,6 +13,18 @@ int main(){
 	MAX_AMOSTRA = dimensoes.dx - LARGURA_MENU - OFFSET_X;  // -> tamanho maximo da amostra
 	VALOR_MAXIMO = dimensoes.dy - 1;  // ->  valor maximo de cada item da amostra
 	(VALOR_MAXIMO > 99 ? VALOR_MAXIMO = 99 : VALOR_MAXIMO);
+=======
+	// Configurações iniciais
+	maximize_window(); 
+	get_size_window(&D_X, &D_Y);
+	ShowConsoleCursor(false);
+	
+	X_INICIAL = LARGURA_MENU + (D_X-LARGURA_MENU-TAMANHO)/2; // -> começa a impressao das barras
+	MAX_AMOSTRA = D_X - LARGURA_MENU - OFFSET_X;  // -> tamanho maximo da amostra
+	VALOR_MAXIMO = D_Y - 1;  // ->  valor maximo de cada item da amostra
+	if(VALOR_MAXIMO>99)
+		VALOR_MAXIMO = 99;
+>>>>>>> a7b8570c2347ea028a1cd9bf1f5a669b354daa4a
 
 	// começa o programa
 	mainMenu();
@@ -98,13 +111,13 @@ void menuAlgoritmo(char algoritmo[]){
 	free(vetor); 
 }
 
-// A maneira que encontrei para fazer as operações na lista foi convertela para uma lista linkada e depois converter para 
-// um array novamente.
+
 void menuAlteracao(int vet[]){
 	bool sair=false;
 	char op;
 	int index, novo_valor=1;
-	copy(vet, TAMANHO);  // -> converte o vetor para uma lista linkada para realizara as operaçoes	
+	copy(vet, TAMANHO);  // -> converte o vetor para uma lista linkada para realizara as operaçoes
+	free(vet);
 	do{
 		imprimirLayout(converterVetor());
 		printf("<1> Substituir\n<2> Remover\n<3> Adicionar\n<4> Voltar\n\nValor minimo: %d\nValor maximo: %d", 1, VALOR_MAXIMO);
@@ -591,15 +604,15 @@ void trocarVetor(int vet[], int l, int r, int velocidade){
 
 //----GERA AMOSTRA----//
 int* gerarVetor(){
-	//funcao calloc para armazenar o vetor no heap para poder utilizar em outro escopo
-	int *vetor = calloc(TAMANHO, sizeof(int)), i; 
+	//Retorna um ponteiro para a mameoria alocada
+	int *vetor = calloc(TAMANHO, sizeof(int)); 
 	
 	/* srand(time(NULL)) objetiva inicializar o gerador de números aleatórios
 	com o valor da função time(NULL). Desta forma, a cada execução o valor 
 	da "semente" será diferente.
 	*/
 	srand(time(NULL));
-	
+	int i;
 	for(i=0;i<TAMANHO;i++)
 		vetor[i] = 1 + (rand() % VALOR_MAXIMO);  // valores aleatorios de 1 - VALOR_MAXIM
 	
