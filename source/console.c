@@ -1,6 +1,5 @@
 #include "console.h"
 
-//retorna o tamanho do console
 void get_size_window(int *col, int *row){
     CONSOLE_SCREEN_BUFFER_INFO cmd;
 
@@ -9,31 +8,29 @@ void get_size_window(int *col, int *row){
     *row = cmd.srWindow.Bottom - cmd.srWindow.Top +1;
 }
 
-//move o cursor para a coordenada X, Y
 void GotoXY(int x, int y){
-    HANDLE a;
-    COORD b;
+    HANDLE out; //handle para std_output
+    COORD coordenadas; //estrutura para coordenadas
+    
     fflush(stdout);
-    b.X = x;
-    b.Y = y;
-    a = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleCursorPosition(a,b);
+    coordenadas.X = x;
+    coordenadas.Y = y;
+    out = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleCursorPosition(out,coordenadas); //seta a posicao do cursos na posicao x,y no std_output
 }
 
-//maxima a tela no inicio do programa
 void maximize_window(){
-    HWND consoleWindow = GetConsoleWindow();
+    HWND consoleWindow = GetConsoleWindow(); //Handle para a janela
     ShowWindow(consoleWindow, SW_MAXIMIZE);
 }
 
-//esconde o cursor
 void ShowConsoleCursor(bool showFlag){
-    HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
+    HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE); //handle para std_output 
 
-    CONSOLE_CURSOR_INFO     cursorInfo;
+    CONSOLE_CURSOR_INFO cursorInfo; 
 
     GetConsoleCursorInfo(out, &cursorInfo);
-    cursorInfo.bVisible = showFlag; // set the cursor visibility
+    cursorInfo.bVisible = showFlag; //seta a visibilidade do cursos
     SetConsoleCursorInfo(out, &cursorInfo);
 }
 

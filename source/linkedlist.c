@@ -1,3 +1,9 @@
+/*
+	Código: Implementação das Operações de Listas Linkadas
+	Autor: Jonathan W. dos Santos
+	Data: 05/12/2022
+*/
+
 #include "linkedlist.h"
 
 typedef struct node{
@@ -5,16 +11,17 @@ typedef struct node{
     struct node *next;
 }node;
 
-//----OPERAÇOES LINKED LIST----//
-
 //recebe um vetor e converte para uma linked list
 void copy(int array[], int tamanho)
 {
-    node *temp = malloc(sizeof(node));
-    temp->data=array[0];
-    temp->next=NULL;
+    node *temp = malloc(sizeof(node));  //Reserva espaço para o primeiro nodo
+  
+    //Coloca o primeiro elemento do array no começo da lista
+    temp->data=array[0]; 
+    temp->next=NULL; 
     head = temp;
     int i;
+    //Atribui o restantes dos elementos do array
     for(i=1;i<tamanho;i++)
     {
         node*temp2= malloc(sizeof(node));
@@ -36,6 +43,7 @@ void percorrer()
 	}	
 }
 
+//Printa os elemento da lista
 void printlist() {
     node*temp = head;
 
@@ -64,13 +72,15 @@ void remover(int index)
 	
 	posicao = malloc(sizeof(node));
 	temp = head;
+	
+	//Percorre a lista ate que i < posicao - 1
 	while(i < index - 1){
-		temp = temp->next;
+		temp = temp->next; //temp == posicao - 1
 		i++;
 	}
-	posicao = temp->next;
-	temp->next = posicao->next;
-	free(posicao);
+	posicao = temp->next; //posiçao guarda exatamente o elemento que será removido
+	temp->next = posicao->next; //sobrescreve o valor que estava na posição index
+	free(posicao); //libera a memoria de posiçao
 	
 }
 
@@ -84,12 +94,13 @@ void adicionar(int index, int valor)
 	temp = head;
 	newnode->data = valor;
 	newnode->next = 0;
+	//Percorre a lista ate que i < posicao - 1
 	while(i<index -1){
-		temp = temp->next;
+		temp = temp->next; //temp = posição
 		i++;
 	}
-	newnode->next = temp->next;
-	temp->next = newnode;
+	newnode->next = temp->next; //O proximo valor do novo nodo é igual ao proximo valor do nodo temporario. 
+	temp->next = newnode; //Sobrescreve o valor d temp->next 
 }
 
 //adiciona um elemento na posicao 0
@@ -135,9 +146,10 @@ int lenLinkedList(){
 //converte a lista para um vetor 
 int* converterVetor(){
 	node *temp = head;
-	int len = lenLinkedList(), i=0;
+	int len = lenLinkedList();
 	int *vetor = calloc(len, sizeof(int));
 	
+	int i=0;
 	while(temp != NULL){
 		vetor[i++] = temp->data;
 		temp = temp->next;

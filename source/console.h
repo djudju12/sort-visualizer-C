@@ -6,16 +6,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-//retorna o tamanho do console
+//Retorna a quantidade buffers presentes na tela 
 void get_size_window(int *col, int *row);
 
-//move o cursor para a coordenada X, Y
+//Move o cursor para a coordenada X, Y
 void GotoXY(int x, int y);
 
-//maxima a tela no inicio do programa
+//Maxima a tela
 void maximize_window();
 
-//esconde o cursor
+//Oculta ou mostra o cursos
 void ShowConsoleCursor(bool showFlag);
 
 #endif

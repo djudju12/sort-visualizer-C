@@ -1,3 +1,10 @@
+/*
+	Código: Declarações das Operações de Listas Linkadas
+	Autor: Jonathan W. dos Santos
+	Data: 05/12/2022
+*/
+
+
 #ifndef LINKEDLIST_H_INCLUDED
 #define LINKEDLIST_H_INCLUDED
 
