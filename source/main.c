@@ -70,6 +70,7 @@ void menuAlgoritmo(char algoritmo[]){
 	bool sair = false;
 
 	vetor = gerarVetor();
+//	imprimirLayout(vetor); 
 	do{
 		imprimirLayout(vetor); 
 		printf("Algoritmo selecionado: %s Sort\nTamanho da amostra: %d\tVelocidade: %d%%\n", algoritmo, TAMANHO, velocidade);
