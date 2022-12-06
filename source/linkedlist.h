@@ -14,35 +14,36 @@
 struct node *head;
 //----OPERAÇOES LINKED LIST----//
 
-//recebe um vetor e converte para uma linked list
+// recebe um vetor e converte para uma linked list
 void copy(int array[], int tamanho);
 
-//percorre a lista
+// percorre a lista
 void percorrer();
 
 void printlist();
 
-//remove o primeiro elemento da lista
+// remove o primeiro elemento da lista
 void removerPrimeiro();
 
-//remove um elemento em dada posicao
+// remove um elemento na posicao index
 void remover(int index);
 
-//adicionar um elemento em dada posicao
+// adiciona um elemento na posicao
 void adicionar(int index, int valor);
 
-//adiciona um elemento na posicao 0
+// adiciona um elemento na posicao 0
 void adicionarPrimeiro(int valor);
 
-//adiciona um elemento na ultima posicao
+// adiciona um elemento na ultima posicao
 void adicionarUltimo(int valor);
 
-//retorna o tamanho da lista
+// retorna o tamanho da lista
 int lenLinkedList();
 
-//converte a lista para um vetor 
+// converte a lista para um vetor 
 int* converterVetor();
 
-//libera o espaço da list
+// libera o espaço da lista
 void freeList();
+
 #endif // LINKEDLIST-OPS_H_INCLUDED
